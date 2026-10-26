@@ -138,7 +138,7 @@ const upgrades=[
 {id:"magnet",name:"불씨 등불",nameEn:"Ember Lantern",desc:"불씨 조각 흡수 범위 +15%",descEn:"Shard pickup range +15%",apply:()=>state.p.pickup*=1.15},
 {id:"heal",name:"노릇한 고기",nameEn:"Roasted Meat",desc:"체력 20 회복",descEn:"Restore 20 HP",apply:()=>state.p.hp=Math.min(state.p.maxHp,state.p.hp+20)},
 {id:"heart",name:"단단한 비늘",nameEn:"Hard Scales",desc:"최대 체력 +20 및 회복",descEn:"Max HP +20 and heal",apply:()=>{state.p.maxHp+=20;state.p.hp=Math.min(state.p.maxHp,state.p.hp+20)}},
-{id:"leech",name:"흡혈 송곳니",nameEn:"Vampire Fang",desc:"적 처치 시 체력 +1 회복",descEn:"Heal 1 HP per enemy defeated",apply:()=>{state.p.killHeal=(state.p.killHeal||0)+1}}
+{id:"leech",name:"흡혈 송곳니",nameEn:"Vampire Fang",desc:"적 처치 시 체력 +0.5 회복",descEn:"Heal 0.5 HP per enemy defeated",apply:()=>{state.p.killHeal=(state.p.killHeal||0)+.5}}
 ];
 /* ===== 등급 시스템 (커먼 회색 / 언커먼 초록 / 에픽 보라 / 레전더리 노랑 / 미스틱 빨강) ===== */
 const RARITY={common:{n:"커먼",nEn:"Common",c:"#9aa0a8"},uncommon:{n:"언커먼",nEn:"Uncommon",c:"#4ade80"},epic:{n:"에픽",nEn:"Epic",c:"#b06cff"},legendary:{n:"레전더리",nEn:"Legendary",c:"#ffd54a"},mythic:{n:"미스틱",nEn:"Mythic",c:"#ff4a5a"}};
@@ -159,7 +159,7 @@ storm:{stats:p=>[[tx("메테오 단계","Meteor level"),p.lightning,p.lightning+
 speed:{stats:p=>[[tx("이동 속도","Move speed"),Math.round(p.speed),Math.round(p.speed*1.05)]],tip:"적 사이를 빠져나가기 쉬워져요. 가만히 있으면 둘러싸여요!",tipEn:"Slip between enemies more easily. Stand still and you'll be surrounded!"},
 magnet:{stats:p=>[[tx("흡수 범위","Pickup range"),Math.round(p.pickup),Math.round(p.pickup*1.15)]],tip:"불씨 조각을 멀리서도 끌어당겨 레벨업이 빨라져요.",tipEn:"Pull in ember shards from farther away to level up faster."},
 heal:{stats:p=>{const n=Math.min(p.maxHp,p.hp+20);return[[tx("체력","HP"),Math.round(p.hp),Math.round(n)],[tx("체력 비율","HP %"),Math.round(p.hp/p.maxHp*100)+"%",Math.round(n/p.maxHp*100)+"%"]]},tip:"위험할 때 바로 쓰는 응급 회복이에요. 최대 체력은 늘지 않아요.",tipEn:"An emergency heal for tight spots. Does not raise max HP."},
-leech:{stats:p=>[[tx("처치당 회복","Heal per kill"),p.killHeal||0,(p.killHeal||0)+1]],tip:"적을 쓰러뜨릴 때마다 조금씩 회복해요. 적이 많이 몰려올수록 든든해요.",tipEn:"Heal a little with every kill. The bigger the horde, the better it gets."},
+leech:{stats:p=>[[tx("처치당 회복","Heal per kill"),p.killHeal||0,(p.killHeal||0)+.5]],tip:"적을 쓰러뜨릴 때마다 조금씩 회복해요. 적이 많이 몰려올수록 든든해요.",tipEn:"Heal a little with every kill. The bigger the horde, the better it gets."},
 heart:{stats:p=>[[tx("최대 체력","Max HP"),p.maxHp,p.maxHp+20],[tx("현재 체력","Current HP"),Math.round(p.hp),Math.round(Math.min(p.maxHp+20,p.hp+20))]],tip:"더 오래 버티는 튼튼한 몸! 최대 체력이 늘고 그만큼 회복돼요.",tipEn:"A sturdier body to last longer! Raises max HP and heals the same amount."}
 };
 upgrades.forEach(u=>{u.info=UP_INFO[u.id]});
@@ -349,7 +349,7 @@ storm:{name:"주작 강림",nameEn:"Zhuque Descends",desc:"하늘에서 불의 �
 speed:{name:"날개 가르기",nameEn:"Wing Cleave",desc:"이동 속도 +5%",descEn:"Move speed +5%",icon:"speed_z",stats:UP_INFO.speed.stats,tip:"바람을 가르며 적 사이를 빠져나가기 쉬워져요. 가만히 있으면 둘러싸여요!",tipEn:"Cut through the wind and slip between enemies. Stand still and you'll be surrounded!"},
 magnet:{name:"불새의 눈",nameEn:"Firebird's Eye",desc:"불씨 조각 흡수 범위 +15%",descEn:"Shard pickup range +15%",icon:"magnet_z",stats:UP_INFO.magnet.stats,tip:"먼 곳의 불씨 조각도 알아보고 끌어당겨 레벨업이 빨라져요.",tipEn:"Spot and pull in distant ember shards to level up faster."},
 heal:{name:"불사조의 눈물",nameEn:"Phoenix Tears",desc:"체력 20 회복",descEn:"Restore 20 HP",icon:"heal_z",stats:UP_INFO.heal.stats,tip:"위험할 때 바로 쓰는 응급 회복이에요. 최대 체력은 늘지 않아요.",tipEn:"An emergency heal for tight spots. Does not raise max HP."},
-leech:{name:"핏빛 깃털",nameEn:"Crimson Plume",desc:"적 처치 시 체력 +1 회복",descEn:"Heal 1 HP per enemy defeated",icon:"leech",stats:UP_INFO.leech.stats,tip:"베어 넘긴 적의 기운을 깃털로 빨아들여요.",tipEn:"Your feathers drink the life of every foe you cut down."},
+leech:{name:"핏빛 깃털",nameEn:"Crimson Plume",desc:"적 처치 시 체력 +0.5 회복",descEn:"Heal 0.5 HP per enemy defeated",icon:"leech",stats:UP_INFO.leech.stats,tip:"베어 넘긴 적의 기운을 깃털로 빨아들여요.",tipEn:"Your feathers drink the life of every foe you cut down."},
 heart:{name:"불사조의 깃옷",nameEn:"Phoenix Plumage",desc:"최대 체력 +20 및 회복",descEn:"Max HP +20 and heal",icon:"heart_z",stats:UP_INFO.heart.stats,tip:"더 오래 버티는 튼튼한 깃털옷! 최대 체력이 늘고 그만큼 회복돼요.",tipEn:"A sturdier feathered cloak! Raises max HP and heals the same amount."}
 });
 /* 주작 전용 레벨업 풀: 불꽃 깃털은 8발(=360°)까지만 등장 */
@@ -401,7 +401,7 @@ storm:{name:"빙결 감옥",nameEn:"Ice Prison",desc:"하늘에서 얼음 기둥
 speed:{name:"느긋한 헤엄",nameEn:"Leisurely Swim",desc:"이동 속도 +5%",descEn:"Move speed +5%",icon:"speed_h",stats:UP_INFO.speed.stats,tip:"현무는 느린 편이라 조금만 빨라져도 큰 차이가 나요.",tipEn:"Hyunmu is slow, so even a little speed makes a big difference."},
 magnet:{name:"거북의 감각",nameEn:"Tortoise Sense",desc:"불씨 조각 흡수 범위 +15%",descEn:"Shard pickup range +15%",icon:"magnet_h",stats:UP_INFO.magnet.stats,tip:"흡수 범위가 좁은 현무에게 특히 쓸모 있어요.",tipEn:"Especially useful for Hyunmu's narrow pickup range."},
 heal:{name:"차가운 샘물",nameEn:"Cool Spring",desc:"체력 20 회복",descEn:"Restore 20 HP",icon:"heal_h",stats:UP_INFO.heal.stats,tip:"위험할 때 바로 쓰는 응급 회복이에요. 최대 체력은 늘지 않아요.",tipEn:"An emergency heal for tight spots. Does not raise max HP."},
-leech:{name:"독사의 흡혈",nameEn:"Viper's Drain",desc:"적 처치 시 체력 +1 회복",descEn:"Heal 1 HP per enemy defeated",icon:"leech",stats:UP_INFO.leech.stats,tip:"뱀이 쓰러진 적의 기운을 빨아들여 현무를 치유해요.",tipEn:"The serpent drains fallen foes to mend Hyunmu."},
+leech:{name:"독사의 흡혈",nameEn:"Viper's Drain",desc:"적 처치 시 체력 +0.5 회복",descEn:"Heal 0.5 HP per enemy defeated",icon:"leech",stats:UP_INFO.leech.stats,tip:"뱀이 쓰러진 적의 기운을 빨아들여 현무를 치유해요.",tipEn:"The serpent drains fallen foes to mend Hyunmu."},
 heart:{name:"두꺼운 등껍질",nameEn:"Thick Shell",desc:"최대 체력 +20 및 회복",descEn:"Max HP +20 and heal",icon:"heart_h",stats:UP_INFO.heart.stats,tip:"더 두꺼운 등껍질로 더 오래 버텨요.",tipEn:"A thicker shell to last even longer."}
 };
 /* 현무 레벨업 풀: id -> [등급, 등장 확률(%)] (합계 100) */
@@ -423,7 +423,7 @@ storm:{name:"벼락 발톱",nameEn:"Thunder Claw",desc:"하늘에서 벼락이 �
 speed:{name:"날쌘 몸놀림",nameEn:"Nimble Body",desc:"이동 속도 +5%",descEn:"Move speed +5%",icon:"speed",stats:UP_INFO.speed.stats,tip:"원래 빠른 백호가 더 빨라져요.",tipEn:"The already-fast Baekho gets even faster."},
 magnet:{name:"예민한 수염",nameEn:"Keen Whiskers",desc:"불씨 조각 흡수 범위 +15%",descEn:"Shard pickup range +15%",icon:"magnet",stats:UP_INFO.magnet.stats,tip:"멀리 있는 불씨 조각도 느껴요.",tipEn:"Sense shards from farther away."},
 heal:{name:"사냥한 고기",nameEn:"Fresh Catch",desc:"체력 20 회복",descEn:"Restore 20 HP",icon:"heal",stats:UP_INFO.heal.stats,tip:"체력이 낮은 백호의 응급 회복이에요.",tipEn:"An emergency heal for low-HP Baekho."},
-leech:{name:"포식자의 피",nameEn:"Predator's Blood",desc:"적 처치 시 체력 +1 회복",descEn:"Heal 1 HP per enemy defeated",icon:"leech",stats:UP_INFO.leech.stats,tip:"많이 잡는 백호와 특히 잘 맞아요.",tipEn:"A great match for Baekho's fast kills."},
+leech:{name:"포식자의 피",nameEn:"Predator's Blood",desc:"적 처치 시 체력 +0.5 회복",descEn:"Heal 0.5 HP per enemy defeated",icon:"leech",stats:UP_INFO.leech.stats,tip:"많이 잡는 백호와 특히 잘 맞아요.",tipEn:"A great match for Baekho's fast kills."},
 heart:{name:"두꺼운 털가죽",nameEn:"Thick Pelt",desc:"최대 체력 +20 및 회복",descEn:"Max HP +20 and heal",icon:"heart",stats:UP_INFO.heart.stats,tip:"약한 몸을 보완해 줘요.",tipEn:"Shores up Baekho's frail body."}};
 Object.assign(BUP,SK);const BUP_RARITY={dash:["epic",12],ad:["uncommon",11],ar:["common",13],ap:["epic",5],leech:["uncommon",7],heal:["common",10],speed:["common",10],magnet:["common",10],b_prey:["uncommon",5],heart:["uncommon",9],b_ghost:["epic",4],b_chain:["legendary",3],b_roar:["mythic",1]};
 const BAPPLY={ap:()=>{const p=state.p;p.clawReach=(p.clawReach||BAEKHO.claw.reach)+12;p.clawArc=Math.min(2.6,(p.clawArc||BAEKHO.claw.arc)+.17)},
@@ -442,7 +442,7 @@ storm:{name:"용오름",nameEn:"Dragon Spout",desc:"하늘에서 벼락이 쏟�
 speed:{name:"구름 타기",nameEn:"Cloud Ride",desc:"이동 속도 +5%",descEn:"Move speed +5%",icon:"speed",stats:UP_INFO.speed.stats,tip:"구름을 타고 가볍게 움직여요.",tipEn:"Glide along on the clouds."},
 magnet:{name:"여의주 감각",nameEn:"Pearl Sense",desc:"불씨 조각 흡수 범위 +15%",descEn:"Shard pickup range +15%",icon:"magnet",stats:UP_INFO.magnet.stats,tip:"여의주가 멀리 있는 조각도 끌어와요.",tipEn:"The pearl draws in distant shards."},
 heal:{name:"봄 이슬",nameEn:"Spring Dew",desc:"체력 20 회복",descEn:"Restore 20 HP",icon:"heal",stats:UP_INFO.heal.stats,tip:"위험할 때 쓰는 응급 회복이에요.",tipEn:"An emergency heal."},
-leech:{name:"생명의 비",nameEn:"Rain of Life",desc:"적 처치 시 체력 +1 회복",descEn:"Heal 1 HP per enemy defeated",icon:"leech",stats:UP_INFO.leech.stats,tip:"번개로 한꺼번에 잡는 청룡과 잘 맞아요.",tipEn:"Great with Cheongryong's mass chain kills."},
+leech:{name:"생명의 비",nameEn:"Rain of Life",desc:"적 처치 시 체력 +0.5 회복",descEn:"Heal 0.5 HP per enemy defeated",icon:"leech",stats:UP_INFO.leech.stats,tip:"번개로 한꺼번에 잡는 청룡과 잘 맞아요.",tipEn:"Great with Cheongryong's mass chain kills."},
 heart:{name:"푸른 비늘",nameEn:"Azure Scales",desc:"최대 체력 +20 및 회복",descEn:"Max HP +20 and heal",icon:"heart",stats:UP_INFO.heart.stats,tip:"더 단단한 비늘로 오래 버텨요.",tipEn:"Tougher scales to last longer."}};
 Object.assign(CUP,SK);const CUP_RARITY={rain:["epic",12],ad:["uncommon",11],ap:["epic",7],ar:["common",12],leech:["uncommon",6],heal:["common",10],speed:["common",9],magnet:["common",9],heart:["uncommon",10],c_web:["epic",7],c_spout:["legendary",5],c_ascend:["mythic",2]};
 const CAPPLY={ap:()=>{state.p.chainJumps=(state.p.chainJumps||0)+1},
@@ -464,7 +464,7 @@ storm:{name:"하늘의 돌비",nameEn:"Stone Rain",desc:"하늘에서 바위가 
 speed:{name:"구름 걸음",nameEn:"Cloud Step",desc:"이동 속도 +5%",descEn:"Move speed +5%",icon:"speed",stats:UP_INFO.speed.stats,tip:"황금 구름을 타고 가볍게 움직여요.",tipEn:"Glide along on golden clouds."},
 magnet:{name:"금빛 수염",nameEn:"Golden Whiskers",desc:"불씨 조각 흡수 범위 +15%",descEn:"Shard pickup range +15%",icon:"magnet",stats:UP_INFO.magnet.stats,tip:"멀리 있는 조각도 느껴요.",tipEn:"Sense shards from farther away."},
 heal:{name:"오곡 공양",nameEn:"Harvest Offering",desc:"체력 20 회복",descEn:"Restore 20 HP",icon:"heal",stats:UP_INFO.heal.stats,tip:"위험할 때 쓰는 응급 회복이에요.",tipEn:"An emergency heal."},
-leech:{name:"생명의 대지",nameEn:"Living Earth",desc:"적 처치 시 체력 +1 회복",descEn:"Heal 1 HP per enemy defeated",icon:"leech",stats:UP_INFO.leech.stats,tip:"기둥으로 한꺼번에 잡는 황룡과 잘 맞아요.",tipEn:"Great with Hwangryong's pillar sweeps."},
+leech:{name:"생명의 대지",nameEn:"Living Earth",desc:"적 처치 시 체력 +0.5 회복",descEn:"Heal 0.5 HP per enemy defeated",icon:"leech",stats:UP_INFO.leech.stats,tip:"기둥으로 한꺼번에 잡는 황룡과 잘 맞아요.",tipEn:"Great with Hwangryong's pillar sweeps."},
 seal:{name:"오행 상생",nameEn:"Five-Phase Harmony",desc:"봉인 폭발 피해 +30% · 범위 +12 (처음 고르면 봉인에 필요한 속성 -1)",descEn:"Seal blast damage +30% · radius +12 (first pick: one fewer element needed)",icon:"seal_w",stats:p=>[[tx("필요 속성","Elements needed"),Math.max(2,HWANG.seal.need-(p.sealEase||0)),Math.max(2,HWANG.seal.need-1)],[tx("폭발 피해","Blast damage"),Math.round((p.sealMul||1)*100)+"%",Math.round((p.sealMul||1)*130)+"%"]],tip:"속성이 2개만 모여도 봉인돼서 연쇄 폭발이 훨씬 잦아져요.",tipEn:"Seals trigger with just 2 elements, so chain blasts happen far more often."},
 heart:{name:"단단한 용린",nameEn:"Sturdy Dragonhide",desc:"최대 체력 +20 및 회복",descEn:"Max HP +20 and heal",icon:"heart",stats:UP_INFO.heart.stats,tip:"더 오래 버텨요.",tipEn:"Last longer."}};
 Object.assign(WUP,SK);const WUP_RARITY={seal:["epic",6],cycle:["epic",9],ad:["uncommon",10],ap:["epic",7],ar:["common",11],gscale:["uncommon",7],leech:["uncommon",6],heal:["common",8],speed:["common",7],magnet:["common",8],heart:["uncommon",9],w_ley:["epic",6],w_form:["legendary",4],w_desc:["mythic",2]};
@@ -500,7 +500,7 @@ grace:{name:"깊은 은총",nameEn:"Deeper Grace",desc:"보호막 최대치 +10%
 speed:{name:"구름 발굽",nameEn:"Cloud Hooves",desc:"이동 속도 +5%",descEn:"Move speed +5%",icon:"speed",stats:UP_INFO.speed.stats,tip:"구름을 밟고 가볍게 달려요.",tipEn:"Trot lightly across the clouds."},
 magnet:{name:"상서로운 기운",nameEn:"Auspicious Aura",desc:"불씨 조각 흡수 범위 +15%",descEn:"Shard pickup range +15%",icon:"magnet",stats:UP_INFO.magnet.stats,tip:"멀리 있는 조각도 끌어와요.",tipEn:"Draw in distant shards."},
 heal:{name:"성스러운 샘",nameEn:"Holy Spring",desc:"체력 20 회복",descEn:"Restore 20 HP",icon:"heal",stats:UP_INFO.heal.stats,tip:"넘치는 회복은 보호막이 돼요.",tipEn:"Overflow becomes a shield."},
-leech:{name:"정화의 빛",nameEn:"Purifying Light",desc:"적 처치 시 체력 +1 회복",descEn:"Heal 1 HP per enemy defeated",icon:"leech",stats:UP_INFO.leech.stats,tip:"낙인과 함께라면 회복이 끊이지 않아요.",tipEn:"With Brand, the healing never stops."},
+leech:{name:"정화의 빛",nameEn:"Purifying Light",desc:"적 처치 시 체력 +0.5 회복",descEn:"Heal 0.5 HP per enemy defeated",icon:"leech",stats:UP_INFO.leech.stats,tip:"낙인과 함께라면 회복이 끊이지 않아요.",tipEn:"With Brand, the healing never stops."},
 heart:{name:"상서로운 비늘",nameEn:"Auspicious Scales",desc:"최대 체력 +20 및 회복",descEn:"Max HP +20 and heal",icon:"heart",stats:UP_INFO.heart.stats,tip:"보호막 최대치도 함께 늘어나요.",tipEn:"Raises the shield cap too."}};
 Object.assign(QUP,SK);
 const QUP_RARITY={smite:["epic",11],ad:["uncommon",11],ap:["epic",6],ar:["common",12],grace:["uncommon",7],leech:["uncommon",5],heal:["common",8],speed:["common",8],magnet:["common",7],heart:["uncommon",7],q_bell:["uncommon",6],q_prism:["epic",7],q_angel:["legendary",3],q_gate:["mythic",2]};
@@ -565,7 +565,7 @@ $("pauseTop").addEventListener("click",e=>{e.currentTarget.blur();pause()});
 ui.pause.addEventListener("click",()=>pause());
 $("startButton").addEventListener("click",e=>diffUI.open("story",e.currentTarget));$("restartButton").addEventListener("click",reset);$("restartTop").addEventListener("click",e=>{e.currentTarget.blur();if(state&&state.p&&!state.dead&&!state.won&&state.time>0){quitUI.open("restart");return}reset()});
 /* 몹 스폰 배율(기본 대비 몇 배) / 동시에 존재할 수 있는 최대 몹 수 */
-const SPAWN_MUL=3,MAX_ENEMIES=400;
+const SPAWN_MUL=4.5,MAX_ENEMIES=500; // 밸런스 패치: 스폰 1.5배 (예전 3 / 400)
 function spawnEnemy(){
 let side=Math.floor(Math.random()*4),x=side===0?cam.x-20:side===1?cam.x+W+20:rand(cam.x,cam.x+W),y=side===2?cam.y-20:side===3?cam.y+H+20:rand(cam.y,cam.y+H);
 if(side<2)y=rand(cam.y,cam.y+H);else x=rand(cam.x,cam.x+W);
@@ -2453,6 +2453,10 @@ function drawAltars(){const t=state.time;for(const a of state.altars||[]){if(a.x
  ctx.restore()}}
 /* ===== 추억 상자 & 패시브 아이템 ===== */
 const CHEST_MAX=21,CHEST_RESPAWN=35;
+/* 상자 봉인: 마지막으로 상자를 연 뒤 적을 cost마리 처치해야 다음 상자가 열려요. 열 때마다 필요 수가 mul배로 늘어나요 (최대 max) */
+const CHEST_SEAL={base:20,mul:1.45,max:800};
+const chestCost=()=>Math.min(CHEST_SEAL.max,Math.round(CHEST_SEAL.base*Math.pow(CHEST_SEAL.mul,state.chestOpened||0)));
+const chestLeft=()=>Math.max(0,chestCost()-((state.kills||0)-(state.chestMark||0)));
 const relics=[
 {id:"dew",icon:"🔥",name:"불씨 부싯돌",nameEn:"Ember Flint",desc:"공격 속도 +8%",descEn:"Attack speed +8%",apply:p=>p.arrowRate=Math.max(.2,p.arrowRate/1.08)},
 {id:"needle",icon:"🌋",name:"식지 않는 용암석",nameEn:"Undying Lava Stone",desc:"공격력 +60%",descEn:"Attack +60%",apply:p=>p.dmgMul=(p.dmgMul||1)+.6},
@@ -2461,7 +2465,7 @@ const relics=[
 {id:"cap",icon:"🥚",name:"황금 알껍질",nameEn:"Golden Eggshell",desc:"최대 체력 +35%",descEn:"Max HP +35%",apply:p=>{const n=Math.round(p.maxHp*1.35),d=n-p.maxHp;p.maxHp=n;p.hp=Math.min(n,p.hp+d)}},
 {id:"moss",icon:"🛡️",name:"단단한 비늘 조각",nameEn:"Hard Scale Shard",desc:"받는 피해 -20%",descEn:"Damage taken -20%",apply:p=>p.guard=Math.max(.4,(p.guard||1)*.8)},
 {id:"star",icon:"⭐",name:"별똥별 조각",nameEn:"Shooting Star Shard",desc:"경험치 획득 +8%",descEn:"XP gain +8%",apply:p=>p.xpMul=(p.xpMul||1)+.08},
-{id:"grail",icon:"🩸",name:"피의 성배",nameEn:"Blood Chalice",desc:"가한 피해의 4%를 체력으로 흡수 (1초에 최대 체력의 6%까지)",descEn:"Absorb 4% of damage dealt as HP (up to 6% of max HP per second)",apply:p=>p.vamp=(p.vamp||0)+.04},
+{id:"grail",icon:"🩸",name:"피의 성배",nameEn:"Blood Chalice",desc:"가한 피해의 2%를 체력으로 흡수 (1초에 최대 체력의 3%까지)",descEn:"Absorb 2% of damage dealt as HP (up to 3% of max HP per second)",apply:p=>p.vamp=(p.vamp||0)+.02},
 {id:"honey",icon:"♨️",name:"따끈한 온천수",nameEn:"Warm Hot Spring",desc:"초당 체력 2.5% 재생",descEn:"Regenerate 2.5% HP per second",apply:p=>p.regen=(p.regen||0)+.025}
 ];
 const CHEST_ROWS=["..oooooooooo..",".owwwwwwwwwwo.","owwWwwwwwwWwwo","owwwwwwwwwwwwo","oggggggggggggo","owwwwgyygwwwwo","owwwwggggwwwwo","owwWwwwwwwWwwo","owwwwwwwwwwwwo","oWWWWWWWWWWWWo",".oooooooooooo."];
@@ -2475,7 +2479,7 @@ function placeChest(minFromP){
   if(state.chests.some(c=>Math.hypot(c.x-x,c.y-y)<320))continue;
   state.chests.push({x,y,ph:rand(0,6.28)});return true}
  return false}
-function initChests(){state.chests=[];state.items={};state.bag=[];state.chestT=0;state.toast=null;state.xpFrac=0;
+function initChests(){state.chestOpened=0;state.chestMark=0;state.chestMsgT=0;state.chests=[];state.items={};state.bag=[];state.chestT=0;state.toast=null;state.xpFrac=0;
  if(gameMode!=="tower")for(let i=0;i<CHEST_MAX;i++)placeChest(520)}
 // 상자 아이템: id -> [등급, 등장 확률(%)] (합계 100)
 const RELIC_RARITY={grail:["epic",2],sock:["common",33],lamp:["common",31],dew:["uncommon",15],star:["uncommon",13],moss:["epic",2.5],cap:["epic",1.5],needle:["legendary",1.5],honey:["mythic",.5]};
@@ -2514,7 +2518,7 @@ WEVO.push(
  {id:"hw",flag:"ev_hw",icon:"🏯",name:"오방 천하",nameEn:"Five Realms Under Heaven",need:{w_ley:2,w_form:1},desc:"지맥이 3배 오래 남아 계속 베고, 봉인에 필요한 속성 -1",descEn:"Ley lines last 3× longer and keep cutting · seals need one fewer element"},
  {id:"ql",flag:"ev_ql",icon:"✨",name:"천상의 성창",nameEn:"Celestial Lance",need:{q_prism:3,q_bell:2},desc:"성광 창이 굵어지고, 굴절이 6갈래로 갈라져요",descEn:"The holy lance thickens and Refraction splits into 6 beams",on:p=>{p.lanceW=(p.lanceW||0)+5}});
 WEVO.find(w=>w.id==="hw").on=p=>{p.sealEase=(p.sealEase||0)+1};
-const WEVO_FX={blade:{dmg:2,radius:12,heal:.3,healCap:.02},storm:{dmg:1.5,r:74,cd:.5},pulse:{r:1.4,pull:320},heart:{regen:.005,low:.3,heal:.3,cd:60},main:{dmg:1.5,pierce:2}};
+const WEVO_FX={blade:{dmg:2,radius:12,heal:.15,healCap:.01},storm:{dmg:1.5,r:74,cd:.5},pulse:{r:1.4,pull:320},heart:{regen:.005,low:.3,heal:.3,cd:60},main:{dmg:1.5,pierce:2}};
 const weaponEvo=(()=>{
 const picks=id=>{const r=state.rs&&state.rs.ups[id];return r?r.n:0};
 const avail=()=>{const p=state.p,pool=p.charId==="zhuque"?ZPOOL:p.charId==="hyunmu"?HPOOL:p.charId==="baekho"?BPOOL:p.charId==="cheongryong"?CPOOL:p.charId==="hwangryong"?WPOOL:p.charId==="qilin"?QPOOL:IPOOL;return WEVO.filter(w=>Object.keys(w.need).every(id=>pool.some(u=>u.id===id)))};
@@ -2548,7 +2552,8 @@ function updatePassives(dt){weaponEvo.tick(dt);baekhoTick(dt);cheongTick(dt);hwa
  if(p.vamp){const cap=p.maxHp*.06*(p.vamp/.04);p.vampBud=Math.min(cap,(p.vampBud||0)+cap*dt)}
  if(p.regen&&p.hp>0&&p.hp<p.maxHp)p.hp=Math.min(p.maxHp,p.hp+p.maxHp*p.regen*dt);
  state.chestT+=dt;if(state.mode!=="tower"&&state.chestT>=CHEST_RESPAWN){state.chestT=0;if(state.chests.length<CHEST_MAX)placeChest(600)}
- for(let i=state.chests.length-1;i>=0;i--){const c=state.chests[i];if(dist2(p,c)<(p.r+24)**2){state.chests.splice(i,1);openChest(c)}}
+ if(state.chestMsgT>0)state.chestMsgT-=dt;
+ for(let i=state.chests.length-1;i>=0;i--){const c=state.chests[i];if(dist2(p,c)<(p.r+24)**2){const left=chestLeft();if(left>0){if(!(state.chestMsgT>0)){state.chestMsgT=2.2;state.banner={text:"🔒 "+tx("봉인된 상자 · 적을 "+left+"마리 더 처치하세요","Sealed chest · defeat "+left+" more foes"),t:1.8}}continue}state.chests.splice(i,1);state.chestOpened=(state.chestOpened||0)+1;state.chestMark=state.kills;openChest(c)}}
  if(state.toast){state.toast.t-=dt;if(state.toast.t<=0)state.toast=null}}
 function drawChests(){
  const t=performance.now()/1000;
@@ -2558,6 +2563,7 @@ function drawChests(){
   ctx.globalCompositeOperation="lighter";ctx.globalAlpha=.55+pl*.35;ctx.drawImage(glow,x-70,y-70,140,140);ctx.globalCompositeOperation="source-over";
   ctx.globalAlpha=.4;ctx.fillStyle="#050a08";ctx.fillRect(x-20,y+10,40,6);ctx.globalAlpha=1;
   ctx.drawImage(chestImg,x-21,y-20+b);
+  {const left=chestLeft(),cost=chestCost();ctx.save();ctx.textAlign="center";ctx.font="bold 11px monospace";const ty=y-30+b;if(left>0){const k=1-left/cost,w=34;ctx.fillStyle="rgba(10,6,4,.8)";ctx.fillRect(x-w/2-2,ty-11,w+4,16);ctx.fillStyle="#3a2a1a";ctx.fillRect(x-w/2,ty+2,w,2);ctx.fillStyle="#ffb04a";ctx.fillRect(x-w/2,ty+2,Math.round(w*k),2);ctx.fillStyle="#ffe9b8";ctx.fillText("🔒"+left,x,ty)}else{ctx.globalAlpha=.6+.4*Math.sin(t*6);ctx.fillStyle="#2a1206";ctx.fillText("OPEN",x+1,ty+1);ctx.fillStyle="#ffd54a";ctx.fillText("OPEN",x,ty)}ctx.restore()}
   const s=Math.max(0,Math.sin(t*2+c.ph*2));if(s>.2){const l=Math.round(2+s*3);ctx.globalAlpha=s;ctx.fillStyle="#fff7c0";ctx.fillRect(x+10-l,y-24+b,l*2+1,1);ctx.fillRect(x+10,y-24-l+b,1,l*2+1);ctx.globalAlpha=1}}}
 /* ===== 보유 상자 아이템 바: 마우스 올리면 설명 / 화살표로 접기·펼치기 ===== */
 const relicBar={open:true,slide:0,last:0,hit:[],tab:null,hover:null,pinned:null,mx:-99,my:-99,cur:false};
@@ -3490,6 +3496,7 @@ const d=Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype,"font
 Object.defineProperty(ctx,"font",{configurable:true,get(){return d.get.call(this)},set(v){d.set.call(this,settings.pixelFont?String(v).replace(/bold\s*/,"").replace(/(monospace|sans-serif)\s*$/,'"DotGothic16","Galmuri11",$1'):String(v).replace(/(monospace|sans-serif)\s*$/,'"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif'))}});
 if(document.fonts&&document.fonts.load){document.fonts.load('16px "DotGothic16"','PIXEL');try{const pr=document.fonts.load('11px "Galmuri11"','최후의 불씨');if(pr&&typeof pr.then==="function")pr.then(()=>logo.relang(),()=>{})}catch(_){}}})();
 function applyFont(){document.body.classList.toggle("pixel-font",!!settings.pixelFont)}
+{const r=document.querySelector('[data-i18n="t4"]');if(r){const k='숲에 숨은 <b>용암 보물 상자</b>를 열면 오래 가는 보너스 아이템을 얻어요. 적을 처치해 봉인을 풀어야 열리고, 열수록 더 많이 처치해야 해요.';r.dataset.ko=k;if(!isEN())r.innerHTML=k}}
 {const r=document.querySelector('[data-i18n="rowFont"]');if(r){const k='<strong>픽셀 폰트</strong><small>켜면 도트 글꼴, 끄면 매끈한 일반 글꼴로 읽기 편해져요 (로고는 그대로)</small>';r.dataset.ko=k;if(!isEN())r.innerHTML=k}}
 /* ================= INTRO CINEMATIC · 스토리 인트로 ================= */
 /* ================= 캐릭터별 엔딩 =================
@@ -3968,7 +3975,7 @@ const card=(h3,body,wide)=>'<div class="howto-card'+(wide?" wide":"")+'"><h3>'+h
 function base(){const sk=keyName(settings.skipKey||"n"),tk=keyName(settings.titleKey||"t");
  return card(tx("조작","Controls"),li([[tx("<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 또는 방향키로 이동","<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrow keys to move"),"kb-only"],[tx("공격은 <b>자동</b>으로 나가요","Attacks fire <b>automatically</b>")],[tx("<kbd>P</kbd> 일시정지 (지금 빌드 확인) · <kbd>F</kbd> 전체화면","<kbd>P</kbd> pause (see your build) · <kbd>F</kbd> fullscreen"),"kb-only"],[tx("<kbd>"+sk+"</kbd> 웨이브 스킵 · <kbd>"+tk+"</kbd> 타이틀로","<kbd>"+sk+"</kbd> skip wave · <kbd>"+tk+"</kbd> back to title"),"kb-only"],[tx("레벨업 때 <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 선택 · <kbd>R</kbd> 다시 뽑기","On level-up: <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> to pick · <kbd>R</kbd> to reroll"),"kb-only"],[tx("타이틀에서 <kbd>M</kbd> 배경(맵) 바꾸기","<kbd>M</kbd> on the title screen changes the map"),"kb-only"],[tx("<b>화면을 누르고 드래그</b>하면 가상 조이스틱","<b>Press and drag</b> for a virtual joystick"),"touch-only"],[tx("오른쪽 위 <b>⏸</b> 일시정지 · <b>⏭</b> 스킵","Top right: <b>⏸</b> pause · <b>⏭</b> skip"),"touch-only"]]))
  +card(tx("목표","Goal"),li([[tx("적을 피하며 오래 살아남기","Survive as long as you can")],[tx("불씨 조각 <span class=\"gem\"></span> 을 모아 레벨업 · 강화 3개 중 1개 선택","Collect ember shards <span class=\"gem\"></span> to level up and pick 1 of 3 upgrades")],[tx("캐릭터마다 <b>고유 스킬</b>이 달라요","Every character has its own <b>unique skills</b>")],[tx("NIGHT 50의 최종 보스를 쓰러뜨리면 클리어","Defeat the final boss on NIGHT 50 to clear")]]))
- +card(tx("생존 팁","Tips"),li([[tx("10 NIGHT마다 <b>보스</b>, N45에는 <b>혼등의 마녀</b>가 나타나요.","A <b>boss</b> appears every 10 NIGHTs, and the <b>Lantern Witch</b> on N45.")],[tx("계속 움직이며 적을 한쪽으로 모으세요. 흡수 범위를 늘리면 레벨업이 빨라져요.","Keep moving and herd foes to one side. More pickup range = faster level-ups.")],[tx("<b>제단</b> 위에 5초 서 있으면 능력치 하나를 올릴 수 있어요. <b>보물 상자</b>는 오래 가는 보너스를 줘요.","Stand on an <b>altar</b> for 5s to raise a stat. <b>Treasure chests</b> give lasting bonuses.")],[tx("특정 강화를 함께 모으면 <b>무기 진화</b>가 일어나요 (레벨업 카드에 조합이 표시돼요).","Collect certain upgrades together for a <b>weapon evolution</b> (combos show on the cards).")],[tx("클리어하면 <b>클리어 코인</b>을 얻어요. 캐릭터 구매와 <b>강화 상점</b>(영구 성장)에 써요.","Clearing earns <b>clear coins</b> for new characters and the <b>upgrade shop</b> (permanent growth).")],[tx("본편을 클리어하면 <b>마법의 탑</b>이 열려요. 5층마다 수문장, 100층에 전설의 용이 기다려요.","Clearing the story opens the <b>Magic Tower</b>: a Warden every 5 floors, a legendary dragon on floor 100.")]]),true)}
+ +card(tx("생존 팁","Tips"),li([[tx("10 NIGHT마다 <b>보스</b>, N45에는 <b>혼등의 마녀</b>가 나타나요.","A <b>boss</b> appears every 10 NIGHTs, and the <b>Lantern Witch</b> on N45.")],[tx("계속 움직이며 적을 한쪽으로 모으세요. 흡수 범위를 늘리면 레벨업이 빨라져요.","Keep moving and herd foes to one side. More pickup range = faster level-ups.")],[tx("<b>제단</b> 위에 5초 서 있으면 능력치 하나를 올릴 수 있어요. <b>보물 상자</b>는 오래 가는 보너스를 줘요. 상자는 적을 처치해 봉인을 풀어야 열리고, 열수록 더 많이 처치해야 해요.","Stand on an <b>altar</b> for 5s to raise a stat. <b>Treasure chests</b> give lasting bonuses — defeat foes to break their seal; each chest needs more kills than the last.")],[tx("특정 강화를 함께 모으면 <b>무기 진화</b>가 일어나요 (레벨업 카드에 조합이 표시돼요).","Collect certain upgrades together for a <b>weapon evolution</b> (combos show on the cards).")],[tx("클리어하면 <b>클리어 코인</b>을 얻어요. 캐릭터 구매와 <b>강화 상점</b>(영구 성장)에 써요.","Clearing earns <b>clear coins</b> for new characters and the <b>upgrade shop</b> (permanent growth).")],[tx("본편을 클리어하면 <b>마법의 탑</b>이 열려요. 5층마다 수문장, 100층에 전설의 용이 기다려요.","Clearing the story opens the <b>Magic Tower</b>: a Warden every 5 floors, a legendary dragon on floor 100.")]]),true)}
 function charsTab(){return'<div class="howto-card wide"><h3>'+tx("캐릭터","Characters")+'</h3>'+chars.list().map(c=>{const el2=CHAR_ELEM[c.id]&&ELEM[CHAR_ELEM[c.id]],own=chars.owned(c.id),T=c.id==="ignis"?IGN_EVO:CHAR_EVO[c.id];
  const unlock=c.lock?tx("사신 넷을 모두 Lv 40까지 진화시키면 해금","Unlocked by evolving all four guardians to Lv 40"):c.price?tx("코인 "+c.price+"개로 구매","Buy for "+c.price+" coins"):tx("기본 캐릭터","Starter character");
  return'<div class="ht-ch"><img alt="" src="'+c.img()+'" style="'+(own?"":"filter:brightness(.35)")+'"><div><strong>'+tf(c,"name")+'</strong> <em>'+tf(c,"kind")+'</em>'+(el2?' <span style="color:'+el2.c+'">'+el2.icon+' '+tf(el2,"n")+'</span>':'')
@@ -4076,7 +4083,7 @@ foe1:`Ash Blob<small>Basic foe</small>`,foe2:`Frost Bat<small>Fast but weak</sma
 t1:`When the 10th NIGHT ends, a <b>boss</b> appears. Defeat it to move on to the next NIGHT — you'll heal and a shower of ember shards will drop.`,
 t2:`Standing still gets you surrounded. Keep moving and herd enemies to one side.`,
 t3:`A bigger shard pickup range makes leveling up much faster.`,
-t4:`Open the <b>lava treasure chests</b> hidden in the woods for long-lasting bonus items.`,
+t4:`Open the <b>lava treasure chests</b> hidden in the woods for long-lasting bonus items. Defeat foes to break their seal — each one needs more.`,
 chooseUp:`Choose an upgrade`,overTitle:`Your ember is still too weak.`,finalStats:`Time 00:00 · Kills 0`,retry:`Try again`,toTitle:`Title`,
 pauseBadge:`Paused · <span class="kb-only">Press P to resume</span><span class="touch-only">Tap to resume</span>`,
 rotate:`<span class="phone">📱</span>Please rotate your screen to <b>landscape</b><br><small>Landscape mode gives you a wider view</small>`,
