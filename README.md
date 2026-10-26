@@ -5,7 +5,7 @@
 
 브라우저에서 바로 즐기는 픽셀 서바이벌 로그라이크예요. 몰려오는 적을 자동 공격으로 물리치며 버티고, 레벨업마다 캐릭터 고유 스킬을 골라 강해져요.
 
-🎮 **플레이하기:** https://jiho0913jiho-oss.github.io/pixel-survival/
+🎮 **플레이하기:** https://whochu7004.github.io/pixel-survival/
 
 ---
 
