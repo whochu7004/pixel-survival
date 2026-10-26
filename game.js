@@ -3754,7 +3754,7 @@ const api={tick,
  chest(){sv.total.chests++;dirty=true;check();save()},
  coins:()=>sv.coins,coinImg:()=>coinImg,addCoins(n,earned){if(!(n>0))return;sv.coins+=n;if(earned)sv.coinsEarned+=n;dirty=true;save();refreshCoin()},
  // 해금 조건: 스토리 이지 = 기본 · 스토리 하드/마법의 탑 이지 = 스토리 이지 클리어 · 마법의 탑 하드 = 탑 이지 100F 돌파(101F 도달)
-evo40(id){if(!id||sv.evo40[id])return;sv.evo40[id]=Date.now();dirty=true;check();save()},evo40Of:()=>sv.evo40,clearOf:id=>sv.clearBy[id]||0,kill(t){if(!t)return;sv.kt[t]=(sv.kt[t]||0)+1;dirty=true;if(window.__qAdd){if(MAPMOB[t])window.__qAdd("mapmob",1);else if(t==="elite")window.__qAdd("elite",1)}},kt:()=>sv.kt,bossN:()=>sv.bosses,hwangOpen:()=>GUARD4.every(id=>sv.evo40[id]),
+evo40(id){if(!id||sv.evo40[id])return;sv.evo40[id]=Date.now();dirty=true;check();save()},evo40Of:()=>sv.evo40,clearOf:id=>sv.clearBy[id]||0,best:()=>sv.best,kill(t){if(!t)return;sv.kt[t]=(sv.kt[t]||0)+1;dirty=true;if(window.__qAdd){if(MAPMOB[t])window.__qAdd("mapmob",1);else if(t==="elite")window.__qAdd("elite",1)}},kt:()=>sv.kt,bossN:()=>sv.bosses,hwangOpen:()=>GUARD4.every(id=>sv.evo40[id]),
  title:()=>titleOf(sv.title)&&done(L.find(a=>a.id===sv.title))?titleOf(sv.title):null,refreshTitle:()=>refreshTitle(),
 easyClears:()=>Math.max(0,(sv.total.wins||0)-(sv.total.winsHard||0)),
 floorEasy:()=>Math.max(sv.best.floorEasy||0,(sv.best.floor||0)>(sv.best.floorHard||0)?(sv.best.floor||0):0),
@@ -4556,7 +4556,7 @@ state={time:0,paused:true,dead:false,p:{x:WW/2,y:WH/2,r:10},enemies:[],arrows:[]
 /* ================= 타이틀 메뉴 정리: 플레이 · 기록과 업적 · 설정 · 게임 방법 =================
    플레이 안에: 스토리 · 마법의 탑 · 캐릭터 · 강화 상점 / 기록과 업적 안에: 도감 */
 (()=>{const menu=$("mainMenu");if(!menu)return;
- const css=document.createElement("style");css.textContent="#playPanel .modal-panel{width:min(480px,92vw)}#playPanel .pl-list{display:flex;flex-direction:column;gap:18px;width:min(340px,80vw);margin:14px auto 18px;text-align:center}#playPanel .pl-list .menu-btn{width:100%}#recordsPanel .rc-codex{margin-right:10px}";document.head.appendChild(css);
+ const css=document.createElement("style");css.textContent="#playPanel .modal-panel{width:min(480px,92vw)}#playPanel .pl-list{display:flex;flex-direction:column;gap:18px;width:min(340px,80vw);margin:14px auto 18px;text-align:center}#playPanel .pl-list .menu-btn{width:100%}#playPanel .modal-panel{max-height:96vh;overflow:auto}@media (max-height:700px){#playPanel .pl-list{gap:8px;margin:8px auto 10px}#playPanel .pl-list .menu-btn{min-height:0;padding-top:8px;padding-bottom:8px}}@media (max-height:480px){#playPanel .pl-list{display:grid;grid-template-columns:1fr 1fr;width:min(600px,92vw)}#playPanel .pl-list .menu-btn:first-child{grid-column:1/-1}#playPanel .modal-panel{width:min(680px,96vw);padding-top:12px;padding-bottom:12px}#playPanel .pl-h{margin:0}#playPanel .eyebrow{display:none}}#recordsPanel .rc-codex{margin-right:10px}";document.head.appendChild(css);
  const pn=document.createElement("div");pn.id="playPanel";pn.className="modal hidden";pn.setAttribute("role","dialog");
  pn.innerHTML='<div class="panel modal-panel"><p class="eyebrow">PLAY</p><h2 class="pl-h"></h2><div class="pl-list"></div><div class="panel-actions"><button class="primary-button" type="button" data-pl-close></button></div></div>';
  ui.start.appendChild(pn);modals.play=pn;const list=pn.querySelector(".pl-list");
@@ -4772,7 +4772,7 @@ const rank=(()=>{const KEY="ps_rank_v1";let L={};try{L=JSON.parse(localStorage.g
  const cleanName=t=>String(t||"").replace(/[<>&"'`\\]/g,"").replace(/\s+/g," ").trim().slice(0,12);
  const name=()=>{if(!L.name){L.name=tx("불씨","Ember")+Math.floor(1000+Math.random()*9000);save()}return L.name};
  // 보드 정보: dir 정렬 방향 · fmt 표시
- const B={tower:{dir:"desc",n:"마법의 탑",nEn:"Magic Tower",fmt:v=>v+"F"},clear:{dir:"asc",n:"최단 클리어",nEn:"Fastest Clear",fmt:v=>fmtTime(v)},kills:{dir:"desc",n:"최다 처치",nEn:"Most Kills",fmt:v=>(+v).toLocaleString()},daily:{dir:"desc",n:"오늘의 도전",nEn:"Daily",fmt:v=>(+v).toLocaleString()+tx("점"," pts")}};
+ const B={story:{dir:"desc",n:"스토리",nEn:"Story",fmt:v=>"NIGHT "+Math.floor(v/1e5)+'<small> · '+(v%1e5).toLocaleString()+tx("킬"," kills")+"</small>"},tower:{dir:"desc",n:"마법의 탑",nEn:"Magic Tower",fmt:v=>v+"F"},clear:{dir:"asc",n:"최단 클리어",nEn:"Fastest Clear",fmt:v=>fmtTime(v)},kills:{dir:"desc",n:"최다 처치",nEn:"Most Kills",fmt:v=>(+v).toLocaleString()},daily:{dir:"desc",n:"오늘의 도전",nEn:"Daily",fmt:v=>(+v).toLocaleString()+tx("점"," pts")}};
  const kind=b=>b.split("_")[0],better=(b,a,o)=>o==null||(B[kind(b)].dir==="asc"?a<o:a>o);
  function record(b,sc,c,d){const o=L.best[b];if(o&&!better(b,sc,o.s))return false;L.best[b]={s:sc,c,d,at:Date.now(),sync:0};save();flush();return true}
  let flushing=false;
@@ -4785,6 +4785,7 @@ const rank=(()=>{const KEY="ps_rank_v1";let L={};try{L=JSON.parse(localStorage.g
   if(dailyRun){const sc=dailyScore();record("daily_"+dailyRun.date,sc,c,"easy");return}
   if(s2.kills>0){record("kills_all",s2.kills,c,d);record("kills_"+c,s2.kills,c,d)}
   if(s2.mode==="tower"&&s2.floor>1){record("tower_all",s2.floor,c,d);record("tower_"+c,s2.floor,c,d)}
+  if(s2.mode!=="tower"){const sc=Math.min(99,s2.night||1)*1e5+Math.min(99999,s2.kills);record("story_all",sc,c,d);record("story_"+c,sc,c,d)}
   if(why==="clear"&&s2.mode!=="tower"){const t=Math.round(s2.time);record("clear_all",t,c,d);record("clear_"+c,t,c,d)}}
  const _end=end;end=function(){const r=_end.apply(this,arguments);try{runEnd("dead");if(dailyRun){const b=L.best["daily_"+dailyRun.date];ui.finalStats.textContent+=" · 📅 "+tx("점수 ","Score ")+dailyScore().toLocaleString()+(b?" ("+tx("오늘 최고 ","Today's best ")+b.s.toLocaleString()+")":"")}}catch(_){}return r};
  const _se=showEnding;showEnding=function(){try{runEnd("clear")}catch(_){}return _se.apply(this,arguments)};
@@ -4802,22 +4803,22 @@ const rank=(()=>{const KEY="ps_rank_v1";let L={};try{L=JSON.parse(localStorage.g
  const _u=update;update=function(dt){_u.apply(this,arguments);const s2=state;if(dailyRun&&s2&&s2.p&&!s2.dead&&!s2.dailyDone&&s2.time>=DAILY_LEN)dailyFinish()};
  // ---- 화면 ----
  const css=document.createElement("style");css.textContent=`#dailyOverlay .dc-score{font-size:15px}#dailyOverlay .dc-score b{font-size:30px;color:#ffd54a;font-weight:400}#dailyOverlay .dc-coin{color:#ffcf6a}#dailyOverlay .dc-note,.rk-note{color:#9fd8ff;font-size:13px}
-#rankPanel .modal-panel,#dailyPanel .modal-panel{width:min(640px,95vw);max-height:96vh;overflow:auto}#dailyPanel h2{margin:2px 0 4px}.rk-tabs,.rk-chars{display:flex;gap:6px;margin:6px 0;flex-wrap:wrap}.rk-tabs button,.rk-chars button{flex:1;min-width:0;padding:7px 4px;border:2px solid #6b4a2a;background:rgba(20,10,6,.6);color:#d8c6a0;cursor:pointer;font:inherit;font-size:14px}.rk-chars button{flex:none;padding:4px 8px;font-size:12px}.rk-tabs button.on,.rk-chars button.on{background:#ffb04a;border-color:#ffb04a;color:#2a0e08}
+#rankPanel .modal-panel,#dailyPanel .modal-panel{width:min(640px,95vw);max-height:96vh;overflow:auto}#dailyPanel h2{margin:2px 0 4px}.rk-tabs,.rk-chars{display:flex;gap:6px;margin:6px 0;flex-wrap:wrap}.rk-tabs button,.rk-chars button{flex:1;min-width:0;padding:7px 2px;white-space:nowrap;border:2px solid #6b4a2a;background:rgba(20,10,6,.6);color:#d8c6a0;cursor:pointer;font:inherit;font-size:14px}.rk-chars button{flex:none;padding:4px 8px;font-size:12px}.rk-tabs button.on,.rk-chars button.on{background:#ffb04a;border-color:#ffb04a;color:#2a0e08}
 .rk-me{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:6px 0;padding:6px 10px;background:rgba(0,0,0,.3);font-size:13px;color:#d8e6d4;text-align:left}.rk-me button{padding:5px 10px;font:inherit;font-size:12px;color:#2a0e08;background:#ffb04a;border:0;cursor:pointer}.rk-me input{width:9em;padding:4px 6px;font:inherit;font-size:13px;background:#0a1410;color:#fff;border:1px solid #6b4a2a}
-.rk-list{max-height:42vh;overflow:auto;text-align:left}.rk-row{display:grid;grid-template-columns:42px 1fr auto auto;gap:10px;align-items:center;padding:6px 10px;margin-bottom:4px;border:2px solid #3a2a1a;background:rgba(10,6,4,.55);font-size:14px}.rk-row.me{border-color:#ffb04a;background:rgba(60,30,10,.6)}.rk-row .rk-no{color:#ffcf6a}.rk-row:nth-child(1) .rk-no{color:#ffd54a}.rk-row .rk-c{color:#c8bca0;font-size:12px}.rk-row .rk-s{color:#fff;min-width:64px;text-align:right}.rk-row img{width:22px;height:16px;object-fit:contain;image-rendering:pixelated;vertical-align:-3px;margin-right:4px}.rk-empty{padding:18px;text-align:center;color:#a89a80}
+.rk-list{max-height:42vh;overflow:auto;text-align:left}.rk-row{display:grid;grid-template-columns:42px 1fr auto auto;gap:10px;align-items:center;padding:6px 10px;margin-bottom:4px;border:2px solid #3a2a1a;background:rgba(10,6,4,.55);font-size:14px}.rk-row.me{border-color:#ffb04a;background:rgba(60,30,10,.6)}.rk-row .rk-no{color:#ffcf6a}.rk-row:nth-child(1) .rk-no{color:#ffd54a}.rk-row .rk-c{color:#c8bca0;font-size:12px}.rk-row .rk-s{color:#fff;min-width:64px;text-align:right;white-space:nowrap}.rk-row .rk-s small,.rk-me small{color:#c8bca0;font-size:11px}.rk-row img{width:22px;height:16px;object-fit:contain;image-rendering:pixelated;vertical-align:-3px;margin-right:4px}.rk-empty{padding:18px;text-align:center;color:#a89a80}
 .dc-card{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:8px;margin:6px 0;text-align:left}.dc-box{padding:10px;border:2px solid #3a2a1a;background:rgba(10,6,4,.55)}.dc-box small{display:block;color:#bfae88;font-size:12px}.dc-box strong{display:block;color:#fff;font-weight:400;font-size:16px;margin:2px 0}.dc-box img{display:block;width:100%;height:56px;object-fit:contain;image-rendering:pixelated;background:rgba(0,0,0,.35);margin-bottom:6px}.dc-mod{display:flex;flex-direction:column;justify-content:center}.dc-mod strong{color:#ffcf6a}.dc-rules{font-size:12px;color:#bfae88;line-height:1.6;text-align:left;margin:4px 0}.dc-top{font-size:13px;text-align:left}.dc-top div{display:flex;justify-content:space-between;padding:2px 4px}.dc-top b{color:#ffcf6a;font-weight:400}
 @media (max-width:640px){.dc-card{grid-template-columns:1fr}}`;document.head.appendChild(css);
  const mapThumb={};function thumb(th){if(mapThumb[th])return mapThumb[th];const c=document.createElement("canvas");c.width=192;c.height=120;const g=c.getContext("2d");g.imageSmoothingEnabled=false;try{const sc=sceneOf(th);g.drawImage(sc.bg,0,0,192,120);if(sc.mid)g.drawImage(sc.mid,0,0,192,120);g.drawImage(sc.fg,0,0,192,120)}catch(_){}return mapThumb[th]=c.toDataURL()}
  const charIcon={};function cIcon(id){if(charIcon[id]!=null)return charIcon[id];try{const c=chars.get(id);charIcon[id]=c&&c.img?c.img():""}catch(_){charIcon[id]=""}return charIcon[id]}
- const cName=id=>{const c=chars.get(id);return c?tf(c,"name"):"?"};
+ const cName=id=>{const c=id&&chars.get(id);return c?tf(c,"name"):"—"};
  const leftTime=()=>{const now=Date.now()+9*3600e3,nx=Math.ceil(now/864e5)*864e5,sec=Math.round((nx-now)/1000),h=Math.floor(sec/3600),m=Math.floor(sec%3600/60);return h?h+tx("시간 ","h ")+m+tx("분","m"):m+tx("분","m")};
  async function top(board,n){const sv=await cloud.load();if(!sv||!sv.rankTop)throw new Error("no-rank");return sv.rankTop(board,B[kind(board)].dir,n)}
  // ---- 랭킹 창 ----
  const rp=document.createElement("div");rp.id="rankPanel";rp.className="modal hidden";rp.setAttribute("role","dialog");ui.start.appendChild(rp);modals.rank=rp;
- let rTab="daily",rChar="all",editing=false,reqId=0;
+ let rTab="story",rChar="all",editing=false,reqId=0;
  function boardId(){return rTab==="daily"?"daily_"+kstDate():rTab+"_"+rChar}
  function paintRank(){const u=cloud.user,bid=boardId(),mine=L.best[bid];rp.setAttribute("aria-label",tx("랭킹","Ranking"));
-  rp.innerHTML='<div class="panel modal-panel"><p class="eyebrow">RANKING</p><h2>'+tx("랭킹","Ranking")+'</h2><div class="rk-tabs">'+["daily","tower","clear","kills"].map(k=>'<button type="button" data-rt="'+k+'" class="'+(k===rTab?"on":"")+'">'+tf(B[k],"n")+'</button>').join("")+'</div>'
+  rp.innerHTML='<div class="panel modal-panel"><p class="eyebrow">RANKING</p><h2>'+tx("랭킹","Ranking")+'</h2><div class="rk-tabs">'+["story","clear","tower","kills","daily"].map(k=>'<button type="button" data-rt="'+k+'" class="'+(k===rTab?"on":"")+'">'+tf(B[k],"n")+'</button>').join("")+'</div>'
    +(rTab==="daily"?'':'<div class="rk-chars">'+["all",...END_ORDER].map(id=>'<button type="button" data-rc="'+id+'" class="'+(id===rChar?"on":"")+'">'+(id==="all"?tx("전체","All"):esc(cName(id)))+'</button>').join("")+'</div>')
    +'<div class="rk-me">'+(u?(editing?'<span>'+tx("닉네임 ","Nickname ")+'<input maxlength="12" value="'+esc(name())+'" data-rk-in></span><button type="button" data-rk="save">'+tx("저장","Save")+'</button>':'<span>'+tx("닉네임 ","Nickname ")+'<b>'+esc(name())+'</b> · '+tx("내 기록 ","My best ")+(mine?B[kind(bid)].fmt(mine.s):"—")+'</span><button type="button" data-rk="edit">'+tx("닉네임 변경","Rename")+'</button>')
     :'<span class="rk-note">'+tx("☁ 구글 로그인하면 내 기록이 랭킹에 올라가요","☁ Sign in with Google to post your records")+(mine?' · '+tx("내 기록 ","My best ")+B[kind(bid)].fmt(mine.s):'')+'</span><button type="button" data-rk="login">'+tx("로그인","Sign in")+'</button>')+'</div>'
@@ -4835,10 +4836,10 @@ const rank=(()=>{const KEY="ps_rank_v1";let L={};try{L=JSON.parse(localStorage.g
   else if(k==="save"){const v=cleanName(rp.querySelector("[data-rk-in]").value);if(v){L.name=v;for(const b in L.best)L.best[b].sync=0;save()}editing=false;paintRank()}});
  function openRank(tab,ch,opener){rTab=tab||rTab;if(ch)rChar=ch;editing=false;paintRank();openModal("rank",opener||null)}
  // 기록 · 업적 창에 [랭킹] 버튼
- {const recP=$("recordsPanel"),acts=recP&&recP.querySelector(".panel-actions");if(acts){const b=document.createElement("button");b.type="button";b.id="rankButton";b.className="primary-button rc-codex";const cx=$("codexButton");acts.insertBefore(b,cx?cx.nextSibling:acts.firstChild);b.addEventListener("click",()=>openRank(null,null,b))}}
+ {const recP=$("recordsPanel"),acts=recP&&recP.querySelector(".panel-actions");if(acts){const b=document.createElement("button");b.type="button";b.id="rankButton";b.className="primary-button rc-codex";const cx=$("codexButton");acts.insertBefore(b,cx?cx.nextSibling:acts.firstChild);b.addEventListener("click",()=>openRank("story",null,b))}}
  // ---- 오늘의 도전 창 (플레이 안) ----
  const dp=document.createElement("div");dp.id="dailyPanel";dp.className="modal hidden";dp.setAttribute("role","dialog");ui.start.appendChild(dp);modals.daily=dp;
- const dBtn=document.createElement("button");dBtn.id="dailyButton";dBtn.type="button";dBtn.className="menu-btn";{const pl=document.querySelector("#playPanel .pl-list");if(pl)pl.insertBefore(dBtn,pl.firstChild)}
+ const dBtn=document.createElement("button");dBtn.id="dailyButton";dBtn.type="button";dBtn.className="menu-btn";const rBtn2=document.createElement("button");rBtn2.id="rankPlayButton";rBtn2.type="button";rBtn2.className="menu-btn";{const pl=document.querySelector("#playPanel .pl-list"),tw=$("towerButton");if(pl){const after=tw&&tw.parentNode===pl?tw.nextSibling:pl.children[1]||null;pl.insertBefore(dBtn,after);pl.insertBefore(rBtn2,dBtn.nextSibling)}}rBtn2.addEventListener("click",()=>openRank("story",null,rBtn2));rBtn2.addEventListener("mouseenter",()=>rBtn2.focus({preventScroll:true}));
  function paintDaily(){const D=dailyToday(),M=DAILY_MODS[D.mod],c=chars.get(D.char),b=L.best["daily_"+D.date],owned=chars.owned(D.char);dp.setAttribute("aria-label",tx("오늘의 도전","Daily Challenge"));
   dp.innerHTML='<div class="panel modal-panel"><p class="eyebrow">DAILY CHALLENGE · '+D.date+'</p><h2>📅 '+tx("오늘의 도전","Daily Challenge")+'</h2><p class="rk-note">'+tx("모두에게 같은 조건 · 새 도전까지 ","Same rules for everyone · next in ")+leftTime()+'</p>'
    +'<div class="dc-card"><div class="dc-box"><img alt="" src="'+cIcon(D.char)+'"><small>'+tx("캐릭터","Character")+'</small><strong>'+esc(c?tf(c,"name"):"?")+'</strong><small>'+(owned?tx("보유 중","Owned"):tx("✨ 아직 없어도 오늘은 체험할 수 있어요","✨ Try it today even if you don't own it"))+'</small></div>'
@@ -4851,10 +4852,10 @@ const rank=(()=>{const KEY="ps_rank_v1";let L={};try{L=JSON.parse(localStorage.g
  dp.addEventListener("click",e=>{if(e.target===dp){closeAndRefocus();return}const b=e.target.closest("[data-dc]");if(!b)return;const k=b.dataset.dc;
   if(k==="close")closeAndRefocus();else if(k==="rank")openRank("daily",null,dBtn);else if(k==="go"){dailyRun=dailyToday();closeModals();startGame("story","easy")}});
  dBtn.addEventListener("click",()=>{paintDaily();openModal("daily",dBtn)});dBtn.addEventListener("mouseenter",()=>dBtn.focus({preventScroll:true}));
- function relang(){dBtn.textContent="📅 "+tx("오늘의 도전","Daily Challenge");const rb=$("rankButton");if(rb)rb.textContent="🏆 "+tx("랭킹","Ranking");if(!rp.classList.contains("hidden"))paintRank();if(!dp.classList.contains("hidden"))paintDaily()}
+ function relang(){dBtn.textContent="📅 "+tx("오늘의 도전","Daily Challenge");rBtn2.textContent="🏆 "+tx("랭킹","Ranking");const rb=$("rankButton");if(rb)rb.textContent="🏆 "+tx("랭킹","Ranking");if(!rp.classList.contains("hidden"))paintRank();if(!dp.classList.contains("hidden"))paintDaily()}
  relang();window.__rankRelang=relang;
  // 로그인하면 쌓아 둔 기록을 올려요
- setTimeout(()=>{flush()},4000);
+ setTimeout(()=>{try{if(!L.seeded){const b=rec.best();if(b){if(b.floor>1)record("tower_all",b.floor,"",b.floorHard>=b.floor?"hard":"easy");if(b.kills>0)record("kills_all",b.kills,"","easy");if(b.clear>0)record("clear_all",b.clear,"","easy");if(b.night>0)record("story_all",Math.min(99,b.night)*1e5+Math.min(99999,b.kills||0),"","easy")}L.seeded=1;save()}}catch(_){}flush()},4000);
  return{record,flush,runEnd,openRank,get L(){return L},dailyFinish,B}})();
 
 
