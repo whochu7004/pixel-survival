@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#050b09">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="픽셀 서바이벌">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <title>PIXEL SURVIVAL · 최후의 불씨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>/* 어린 용 컨셉 색상 보정 */.logo-main .fly{color:#ffb04a!important;text-shadow:0 0 14px rgba(255,120,40,.85)!important}.gem{filter:hue-rotate(160deg) saturate(1.4)}
+.map-switch{position:absolute;left:12px;bottom:12px;top:auto;z-index:30;display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:3px 10px 3px 8px;font:inherit;font-size:12px;line-height:1;letter-spacing:.04em;color:#ffe9b8;background:rgba(10,6,4,.62);border:1px solid rgba(255,176,74,.45);border-radius:3px;cursor:pointer;opacity:.82;transition:opacity .15s,background .15s,border-color .15s}
+.map-switch:hover,.map-switch:focus-visible{opacity:1;background:rgba(40,16,8,.85);border-color:#ffb04a;outline:none}
+.map-switch .ms-cap{opacity:.65}.map-switch b{font-weight:400;color:#ffb04a}
+.map-switch .ms-ico{width:10px;height:10px;background:#2e6a44;box-shadow:inset -3px -3px 0 #183a2f,0 0 0 1px #0a0505}
+.map-switch[data-theme="burnt"] .ms-ico{background:#ff7a2a;box-shadow:inset -3px -3px 0 #8a2a0c,0 0 0 1px #0a0505}
+.title-screen:has(.modal:not(.hidden)) .map-switch{display:none}
+#skipKeyButton .row-right kbd{min-width:44px;text-align:center;padding:4px 10px;font-size:14px}
+#skipKeyButton.listening .row-right kbd{color:#2a0e08;background:#ffb04a;border-color:#ffb04a;animation:skBlink .8s steps(2) infinite}
+#skipKeyButton.bad small{color:#ff8a94}
+#skipTop.locked{opacity:.45}
+@keyframes skBlink{50%{opacity:.55}}
+@media (max-height:420px){.map-switch{bottom:6px;left:8px;font-size:11px;min-height:24px}}
+</style>
+</head>
+<body class="on-title">
+  <main class="shell">
+    <section class="game-frame" aria-label="게임 화면" data-i18n-aria="aGame">
+      <canvas id="game" width="960" height="600" aria-label="픽셀 서바이벌 게임" data-i18n-aria="aCanvas"></canvas>
+
+      <!-- 모바일 가상 조이스틱 (터치 기기에서만 표시) -->
+      <div id="joyZone" class="joy-zone" aria-hidden="true">
+        <div id="joyBase" class="joy-base idle"><div id="joyKnob" class="joy-knob"></div></div>
+      </div>
+
+      <div class="world-xp">
+        <div class="world-xp-heading"><span data-i18n="shards">불씨 조각</span><strong id="worldExpText">LV 1 · 0 / 8</strong></div>
+        <div class="world-xp-track"><div id="worldExpFill" class="world-xp-fill"></div></div>
+      </div>
+
+      <!-- 플레이 중 상태 표시 -->
+      <section class="hud" aria-label="게임 상태" data-i18n-aria="aHud">
+        <div class="stat">
+          <div class="stat-heading"><span>HP</span><strong id="hpText">100 / 100</strong></div>
+          <div class="bar hp-bar"><div id="hpFill" class="fill"></div></div>
+        </div>
+        <div class="stat">
+          <div class="stat-heading"><span>EXP · LV <b id="levelText">1</b></span><strong id="expText">0 / 8</strong></div>
+          <div class="bar exp-bar"><div id="expFill" class="fill"></div></div>
+        </div>
+        <div class="stat compact"><span class="label" data-i18n="time">생존 시간</span><strong id="timeText">00:00</strong></div>
+        <div class="stat compact"><span class="label" data-i18n="kills">처치</span><strong id="killsText">0</strong></div>
+      </section>
+
+      <div class="corner">
+        <button id="pauseTop" class="ghost-button touch-only" type="button" data-i18n="pauseTop">⏸ 일시정지</button>
+        <button id="titleTop" class="ghost-button" type="button" data-i18n="titleTop">⌂ 타이틀</button>
+        <button id="skipTop" class="ghost-button" type="button" title="웨이브 스킵" data-i18n="skipTop">⏭ 스킵<span class="kb-only"> (<span class="skip-key-label">N</span>)</span></button>
+        <button id="restartTop" class="ghost-button" type="button" data-i18n="restartTop">새 게임 ↻</button>
+      </div>
+
+      <!-- ============ 타이틀 화면 ============ -->
+      <div id="startOverlay" class="overlay title-screen" role="dialog" aria-label="타이틀 화면" data-i18n-aria="aTitle">
+        <canvas id="titleCanvas" width="384" height="240" aria-hidden="true"></canvas>
+
+        <!-- 타이틀 배경(맵) 변경 버튼 -->
+        <button id="mapSwitch" class="map-switch" type="button" data-theme="forest" title="타이틀 배경 변경 (M)" data-i18n-title="mapTitle">
+          <span class="ms-ico" aria-hidden="true"></span><span class="ms-cap" data-i18n="mapCap">배경</span><b id="mapSwitchLabel">재의 숲</b>
+        </button>
+
+        <div class="title-ui">
+          <header class="logo">
+            <p class="eyebrow">A TINY SURVIVAL ROGUELIKE</p>
+            <h1 class="logo-main"><canvas id="logoCanvas" width="288" height="80" role="img" aria-label="PIXEL SURVIVAL — 최후의 불씨" data-i18n-aria="logo"></canvas></h1>
+            <p class="logo-sub">최후의 불씨</p>
+            <p class="tagline" data-i18n="tagline">아기 용과 수호수들이 마지막 불씨를 지켜요.<br>흩어진 불씨 조각을 모아 꺼져 가는 세상을 다시 밝히세요.</p>
+          </header>
+
+          <nav class="menu" id="mainMenu" aria-label="메인 메뉴" data-i18n-aria="aMenu">
+            <button id="startButton" class="menu-btn primary" type="button" data-i18n="play">플레이</button>
+            <button id="settingsButton" class="menu-btn" type="button" data-i18n="settings">설정</button>
+            <button id="howtoButton" class="menu-btn" type="button" data-i18n="howto">게임 방법</button>
+          </nav>
+
+          <p class="title-hint kb-only" data-i18n="titleHint"><kbd>↑</kbd><kbd>↓</kbd> 선택 · <kbd>Enter</kbd> 확인 · <kbd>F</kbd> 전체화면</p>
+          <span class="version" data-i18n="version">V0.37 · 사신과 영수들</span>
+        </div>
+
+        <!-- 설정 -->
+        <div id="settingsPanel" class="modal hidden" role="dialog" aria-label="설정" data-i18n-aria="aSettings">
+          <div class="panel modal-panel">
+            <p class="eyebrow">SETTINGS</p>
+            <h2 data-i18n="settings">설정</h2>
+
+            <button id="langButton" class="setting-row" type="button" aria-label="언어 / Language">
+              <span class="row-text"><strong>언어 · Language</strong><small data-i18n="langHint">게임에 표시되는 언어를 바꿔요</small></span>
+              <span class="row-right"><b class="state-text">한국어</b></span>
+            </button>
+            <button id="fsButton" class="setting-row toggle" type="button" role="switch" aria-checked="false">
+              <span class="row-text" data-i18n="rowFs"><strong>전체화면</strong><small>F 키로도 켜고 끌 수 있어요</small></span>
+              <span class="row-right"><span class="switch"><i></i></span><b class="state-text">꺼짐</b></span>
+            </button>
+            <button class="setting-row toggle" type="button" role="switch" data-key="pixelFont" aria-checked="true">
+              <span class="row-text" data-i18n="rowFont"><strong>픽셀 폰트</strong><small>글자를 도트 느낌의 픽셀 폰트로 표시해요</small></span>
+              <span class="row-right"><span class="switch"><i></i></span><b class="state-text">켜짐</b></span>
+            </button>
+            <button class="setting-row toggle" type="button" role="switch" data-key="fireflies" aria-checked="true">
+              <span class="row-text" data-i18n="rowFx"><strong>불씨 효과</strong><small>숲 속을 떠다니는 불씨를 표시해요</small></span>
+              <span class="row-right"><span class="switch"><i></i></span><b class="state-text">켜짐</b></span>
+            </button>
+            <button class="setting-row toggle" type="button" role="switch" data-key="vignette" aria-checked="true">
+              <span class="row-text" data-i18n="rowVig"><strong>어두운 화면 가장자리</strong><small>밤 분위기를 위한 비네팅 효과</small></span>
+              <span class="row-right"><span class="switch"><i></i></span><b class="state-text">켜짐</b></span>
+            </button>
+            <button class="setting-row toggle" type="button" role="switch" data-key="autoPause" aria-checked="true">
+              <span class="row-text" data-i18n="rowAuto"><strong>자동 일시정지</strong><small>창을 벗어나면 게임을 멈춰요</small></span>
+              <span class="row-right"><span class="switch"><i></i></span><b class="state-text">켜짐</b></span>
+            </button>
+            <button id="skipKeyButton" class="setting-row kb-only" type="button" aria-label="웨이브 스킵 단축키 변경" data-i18n-aria="aSkipKey">
+              <span class="row-text"><strong data-i18n="rowSkip">웨이브 스킵 단축키</strong><small id="skipKeyHint">누른 뒤 원하는 키를 입력하세요 · Esc 취소</small></span>
+              <span class="row-right"><kbd id="skipKeyLabel" class="skip-key-label">N</kbd></span>
+            </button>
+
+            <div class="panel-actions"><button class="primary-button" type="button" data-close data-i18n="back">돌아가기</button></div>
+          </div>
+        </div>
+
+        <!-- 게임 방법 -->
+        <div id="howtoPanel" class="modal hidden" role="dialog" aria-label="게임 방법" data-i18n-aria="aHowto">
+          <div class="panel modal-panel wide-panel">
+            <p class="eyebrow">HOW TO PLAY</p>
+            <h2><img class="inline-sprite" data-sprite="dragonA" alt=""> <span data-i18n="howto">게임 방법</span></h2>
+
+            <div class="howto-grid">
+              <div class="howto-card">
+                <h3 data-i18n="h3Controls">조작</h3>
+                <ul>
+                  <li class="kb-only" data-i18n="hMove"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 또는 방향키로 이동</li>
+                  <li data-i18n="hAuto">공격은 <b>자동</b>으로 나갑니다</li>
+                  <li class="kb-only" data-i18n="hPause"><kbd>P</kbd> 일시정지 · <kbd>F</kbd> 전체화면</li>
+                  <li class="kb-only" data-i18n="hSkip"><kbd class="skip-key-label">N</kbd> 웨이브 스킵 <small>(보스전 중에는 불가 · 설정에서 키 변경)</small></li>
+                  <li class="touch-only" data-i18n="hSkipT">오른쪽 위 <b>⏭ 스킵</b> 버튼으로 웨이브 스킵 <small>(보스전 중에는 불가)</small></li>
+                  <li class="touch-only" data-i18n="hJoy"><b>화면을 누르고 드래그</b>하면 가상 조이스틱이 나타나요</li>
+                  <li class="touch-only" data-i18n="hPauseT">오른쪽 위 <b>⏸</b> 버튼으로 일시정지</li>
+                </ul>
+              </div>
+              <div class="howto-card">
+                <h3 data-i18n="h3Goal">목표</h3>
+                <ul>
+                  <li data-i18n="g1">식어 가는 숲의 적들을 피하며 오래 살아남기</li>
+                  <li data-i18n="g2">적이 떨어뜨린 불씨 조각 <span class="gem"></span> 을 모아 레벨업</li>
+                  <li data-i18n="g3">레벨업마다 강화 3개 중 1개 선택</li>
+                </ul>
+              </div>
+              <div class="howto-card wide">
+                <h3 data-i18n="h3Foes">숲의 적들</h3>
+                <div class="foes">
+                  <div class="foe"><img data-sprite="blob" alt=""><span data-i18n="foe1">재 덩이<small>기본 적</small></span></div>
+                  <div class="foe"><img data-sprite="bat" alt=""><span data-i18n="foe2">서리 박쥐<small>빠르지만 약함</small></span></div>
+                  <div class="foe"><img data-sprite="stump" alt=""><span data-i18n="foe3">서리 바위<small>튼튼하고 아파요</small></span></div>
+                </div>
+              </div>
+              <div class="howto-card wide">
+                <h3 data-i18n="h3Tips">생존 팁</h3>
+                <ul>
+                  <li data-i18n="t1">10번째 NIGHT가 끝나면 <b>보스</b>가 나타나요. 보스를 처치해야 다음 NIGHT로 넘어가며, 체력이 회복되고 불씨 조각이 쏟아집니다.</li>
+                  <li data-i18n="t2">가만히 있으면 둘러싸여요. 계속 움직이며 적을 한쪽으로 모으세요.</li>
+                  <li data-i18n="t3">불씨 조각 흡수 범위를 늘리면 레벨업이 훨씬 빨라집니다.</li>
+                  <li data-i18n="t6">맵 곳곳의 <b>제단</b> 위에 5초 동안 서 있으면 게이지가 차고, 공격력·자연 회복·최대 체력 같은 능력치를 하나 올릴 수 있어요.</li>
+                  <li data-i18n="t4">숲에 숨은 <b>용암 보물 상자</b>를 열면 오래 가는 보너스 아이템을 얻어요.</li>
+                  <li data-i18n="t5">본편을 클리어하면 <b>마법의 탑</b>이 열려요. 층마다 목표 수만큼 적을 쓰러뜨리면 포탈이 열리고, 5층마다 수문장이, 100층마다 전설의 용이 기다려요. 층을 오를 때마다 보물 아이템을 하나씩 얻고, 높이 오를수록 적이 강해져요.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="panel-actions"><button class="primary-button" type="button" data-close data-i18n="back">돌아가기</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 레벨업 -->
+      <div id="levelOverlay" class="overlay hidden">
+        <div class="panel level-panel">
+          <p class="eyebrow">LEVEL UP!</p>
+          <h2 data-i18n="chooseUp">강화를 선택하세요</h2>
+          <div id="upgradeChoices" class="upgrade-choices"></div>
+        </div>
+      </div>
+
+      <!-- 게임 오버 -->
+      <div id="gameOverOverlay" class="overlay hidden">
+        <div class="panel">
+          <p class="eyebrow">RUN ENDED</p>
+          <h2 data-i18n="overTitle">불씨가 아직 약하다.</h2>
+          <p id="finalStats" data-i18n="finalStats">생존 시간 00:00 · 처치 0</p>
+          <div class="panel-actions">
+            <button id="restartButton" class="primary-button" type="button" data-i18n="retry">다시 도전</button>
+            <button id="toTitleButton" class="ghost-button big" type="button" data-i18n="toTitle">타이틀로</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="pauseBadge" class="pause-badge hidden" data-i18n="pauseBadge">일시정지 · <span class="kb-only">P를 눌러 계속</span><span class="touch-only">탭하여 계속</span></div>
+
+      <!-- 세로 모드 안내 (터치 기기) -->
+      <div class="rotate-hint" aria-live="polite"><div data-i18n="rotate"><span class="phone">📱</span>화면을 <b>가로</b>로 돌려주세요<br><small>가로 모드에서 더 넓게 플레이할 수 있어요</small></div></div>
+    </section>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>

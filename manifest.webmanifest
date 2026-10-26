@@ -1,0 +1,18 @@
+{
+  "name": "PIXEL SURVIVAL · 최후의 불씨",
+  "short_name": "픽셀 서바이벌",
+  "description": "아기 용과 수호수들이 마지막 불씨를 지키는 픽셀 서바이벌",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#050b09",
+  "theme_color": "#050b09",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
