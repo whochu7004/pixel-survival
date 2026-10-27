@@ -1,4 +1,4 @@
-# PIXEL SURVIVAL · 최후의 불씨
+# ASHENWYRD: The Last Ember
 
 > 아기 용과 수호수들이 마지막 불씨를 지켜요.
 > 흩어진 불씨 조각을 모아 꺼져 가는 세상을 다시 밝히세요.
