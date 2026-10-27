@@ -1155,13 +1155,23 @@ const QI_FA=["..oCCCo..oCCCo..","..oooo....oooo..","................"],QI_FB=[".
 SP.qilinA=pack([...QI_BODY,...QI_FA],QI_PAL);SP.qilinB=pack([...QI_BODY,...QI_FB],QI_PAL);
 
 /* ================= 이무기 (용이 되지 못한 큰 뱀): 독침 · 독니 · 승천의 염원 ================= */
-const IM_PAL={o:"#0e2a24",G:"#3aa88a",g:"#2a7a68",B:"#e8f0c8",w:"#ffffff",e:"#0e1a14",p:"#ff9ab8",Y:"#ffd54a",t:"#ff5a6a"};
+const IM_PAL={o:"#0e2a24",G:"#3aa88a",g:"#2a7a68",B:"#e8f0c8",w:"#ffffff",e:"#0e1a14",p:"#ff9ab8",Y:"#ffd54a",t:"#ff5a6a",F:"#9affd8",M:"#ffe8a0",a:"#2088a8",c:"#ffffff"};
 const IM_BODY=["......oooo......","....ooGGGGoo....","...oGGGGGGGGo...","..oGGgGGGGgGGo..",".oGGGGGGGGGGGGo.",".oGGweGGGGweGGo.",".oGGeeGGGGeeGGo.",".oGpGGGGGGGGpGo.","..oGGGGttGGGGo..","...ooGGttGGoo...","....oBBBBBBo....","...oGBBBBBBGo...","..oGGBBYBBBGGo..",".oGGgBBBBBBgGGo.","oGGGGoBBBBoGGGGo","oGgGGGooooGGGgGo",".oGGGGGGGGGGGGo."];
 const IM_FA=["..oGGGGGGGGGGo..","...oooooooooo...","................"],IM_FB=["...oGGGGGGGGGGo.","....oooooooooo..","................"];
 SP.imugiA=pack([...IM_BODY,...IM_FA],IM_PAL);SP.imugiB=pack([...IM_BODY,...IM_FB],IM_PAL);
-function imugiTail(g,t,mv){const N=7,sp=mv?9:3,pts=[];for(let i=0;i<N;i++)pts.push([Math.round(-10-i*3.2),Math.round(8-i*1.2+Math.sin(t*sp-i*.9)*(1.4+i*.35))]);
- for(let i=N-1;i>=0;i--){const [x,y]=pts[i],r=Math.max(2,5-i*.45);g.fillStyle="#0e2a24";g.fillRect(x-r-1,y-r-1,r*2+2,r*2+2);g.fillStyle=i%2?"#2a7a68":"#3aa88a";g.fillRect(x-r,y-r,r*2,r*2);if(i===N-1){g.fillStyle="#ffd54a";g.fillRect(x-1,y-1,2,2)}}
- const tp=pts[N-1];return[tp[0],tp[1]]}
+// 이무기 꼬리: 움직이지 않는 픽셀 꼬리 (몸과 같은 2px 도트) · 진화할수록 길어지고 지느러미 → 금빛 가시와 갈기 꼬리끝
+const IM_TAIL=[
+ [".oo.......","oYYo......","oGGGo.....","oGgGo.....",".oGGGoo...","..oGGGGooo","...ogGGGGG","....oogggg","......oooo"],
+ [".oo...........","oYYo..........","oFFFo...o...o.","oGgGo..oFo.oFo",".oGGGooGGGoGGG","..oGGGGGgGGGGG","...ogGGGGGGGGG","....oogggggggg","......oooooooo"],
+ [".MM.............","MMMMo...........",".MMGGo...o...o..","..oGgGo.oYo.oYo.","...oGGGoGGGoGGGo","....oGGGGGgGGGGG",".....ogGGGGGGGGG","......oogggggggg","........oooooooo"]];
+const IM_TAIL_AT=[[-32,-6,-30,-4],[-40,-6,-38,-4],[-44,-6,-42,-6]];
+const IM_EVO_BODY=[null,
+ ["......oYYo......","....ooGYYGoo....","...oGGGYYGGGo...","..oGGgGGGGgGGo..","FoGGGGGGGGGGGGoF","FoGGweGGGGweGGoF",".oGGeeGGGGeeGGo.",".oGpGGGGGGGGpGo.","..oGGGGttGGGGo..","...ooGGttGGoo...","....oBYBYBYo....","...oGBBBBBBGo...","..oGGYBYBYBGGo..",".oGGgBBBBBBgGGo.","oGGGGoBYBYoGGGGo","oGgGGGooooGGGgGo",".oGGGGGGGGGGGGo."],
+ ["......oooo......","..M.ooGGGGoo.M..",".MMoGGGGGGGGoMM.","MMoGGgGGGGgGGoMM","MoGGGGGGGGGGGGoM","MoGGweGGGGweGGoM","MoGGeeGGGGeeGGoM",".oGpGGGGGGGGpGo.","..oGGGGttGGGGo..","..MooGGttGGooM..",".MMMoBYBYBYoMMM.","...oGBBBBBBGo...","..oaoBYBYBYoao..",".oaacBBBBBBcaao.","oGGGGoBYBYoGGGGo","oGgGGGooooGGGgGo",".oGGGGGGGGGGGGo."]];
+const IM_XPAL={F:"#9affd8",M:"#ffe8a0",a:"#2088a8",c:"#ffffff"};
+let IM_TAILS=null;
+function imugiTail(g,t,mv,st=0){const k=Math.max(0,Math.min(2,st|0));if(!IM_TAILS)IM_TAILS=[0,1,2].map(i=>pack(IM_TAIL[i],Object.assign({},IM_PAL,IM_XPAL,i&&CHAR_EVO.imugi[i]?CHAR_EVO.imugi[i].pal:{})).n);
+ const a=IM_TAIL_AT[k];g.drawImage(IM_TAILS[k],a[0],a[1]);return[a[2],a[3]]}
 function imugiBlink(g,t){if((t%3.3)<.12){g.fillStyle="#3aa88a";g.fillRect(-10,-14,6,6);g.fillRect(4,-14,6,6);g.fillStyle="#0e1a14";g.fillRect(-10,-11,6,1);g.fillRect(4,-11,6,1)}
  const fl=Math.floor(t*2)%3===0&&(t%1)<.25;if(fl){g.fillStyle="#ff5a6a";g.fillRect(-1,-2,2,4);g.fillRect(-2,1,1,2);g.fillRect(1,1,1,2)}}
 function imugiExtras(g,t,mv,p){const st=p?p.evo||0:0,asc=p&&p.imAsc>0;
@@ -1377,7 +1387,9 @@ const CHAR_EVO={
   {lv:40,name:"승천룡",nameEn:"Ascended Dragon",scale:1.2,hp:50,atk:1.25,spd:1.08,pick:1.15,pal:{G:"#38c8d8",g:"#2088a8",Y:"#ffd54a",B:"#fff6d8",o:"#0e1a3a",p:"#ffb0c8"},
    desc:"마침내 용이 되었어요: 승천 중 벼락이 떨어져요 · 승천 10초 · 필요한 처치 50 · 독 최대 중첩 +2",descEn:"Finally a dragon: lightning strikes during Ascension · lasts 10s · needs 50 kills · +2 max venom stacks",skill:p=>{p.venMax=(p.venMax||0)+2}}]};
 {const SRC={zhuque:[ZHU_BODY,ZHU_A,ZHU_B,ZHU_PAL],hyunmu:[HYUN_BODY,HYUN_A,HYUN_B,HYUN_PAL],baekho:[BAEKHO_BODY,BAEKHO_FA,BAEKHO_FB,BAEKHO_PAL],cheongryong:[CHEONG_BODY,CHEONG_FA,CHEONG_FB,CHEONG_PAL],hwangryong:[HW_BODY,HW_FA,HW_FB,HW_PAL],qilin:[QI_BODY,QI_FA,QI_FB,QI_PAL],imugi:[IM_BODY,IM_FA,IM_FB,IM_PAL]};
- for(const id in CHAR_EVO){const [B,FA,FB,PAL]=SRC[id];for(let i=1;i<3;i++){const E=CHAR_EVO[id][i],pl={...PAL,...E.pal};E.A=pack([...B,...FA],pl);E.B=pack([...B,...FB],pl)}}}
+ for(const id in CHAR_EVO){const [B,FA,FB,PAL]=SRC[id];for(let i=1;i<3;i++){const E=CHAR_EVO[id][i],pl={...PAL,...E.pal};E.A=pack([...B,...FA],pl);E.B=pack([...B,...FB],pl)}}
+ // 이무기는 단계마다 몸 모양이 달라요: Lv20 금빛 볏 · 아가미 지느러미 · 금빛 배 비늘 / Lv40 갈기 · 발톱 달린 앞발 (용의 모습)
+ for(let i=1;i<3;i++){const E=CHAR_EVO.imugi[i],pl={...IM_PAL,...E.pal},B=IM_EVO_BODY[i];E.A=pack([...B,...IM_FA],pl);E.B=pack([...B,...IM_FB],pl)}}
 // 머리 장식 등 (스프라이트 좌표: 왼쪽 위 -16,-24 · 한 칸 2px)
 function evoAcc(g,t,mv,p,id,st){const gold="#ffd54a",lite="#fff6c0",ol="#7a5a1a";
  if(id==="zhuque"){if(st>=2){g.drawImage(SP.crown.n,-10,-34)}
@@ -1393,7 +1405,7 @@ function evoAcc(g,t,mv,p,id,st){const gold="#ffd54a",lite="#fff6c0",ol="#7a5a1a"
  if(id==="hwangryong"){if(st>=2){g.drawImage(HW_CROWN.n,-7,-30);g.globalAlpha=.85;for(const [x,r] of [[-9,4],[-3,5],[4,5],[10,4]]){g.fillStyle="#fff0b0";g.beginPath();g.arc(x,12,r,0,6.283);g.fill()}g.globalAlpha=1}
   else for(const [x,h] of [[-4,5],[-1,7],[2,5]]){g.fillStyle="#7a2a1a";g.fillRect(x-1,-20-h-1,4,h+2);g.fillStyle="#ff7a4a";g.fillRect(x,-20-h,2,h);g.fillStyle="#ffd0a0";g.fillRect(x,-20-h,2,2)}}
  if(id==="imugi"){if(st>=2){g.drawImage(SP.antlers.n,-16,-36);g.strokeStyle="#ffd54a";g.lineWidth=1;g.beginPath();for(const d of[-1,1]){g.moveTo(d*7,-6);g.quadraticCurveTo(d*16,-4+Math.sin(t*3)*2,d*20,2)}g.stroke();g.drawImage(SMALL_CROWN.n,-7,-30)}
-  else{for(const d of[-1,1]){g.fillStyle="#0e2a24";g.fillRect(d<0?-9:5,-27,5,5);g.fillStyle="#ffe070";g.fillRect(d<0?-8:6,-26,3,3)}}}
+  /* Lv20: 금빛 볏과 아가미 지느러미는 몸 스프라이트에 그려져 있어요 */}
  if(id==="qilin"){const by=-31+Math.round(Math.sin(t*2.4));g.fillStyle="#7a5a1a";g.fillRect(-9,by-1,18,4);g.fillStyle=st>=2?"#fff0a0":"#ffd54a";g.fillRect(-8,by,16,2);g.fillStyle="#ffffff";g.fillRect(-3,by,3,1);
   if(st>=2){g.globalAlpha=.85;for(const [x,r] of [[-9,4],[-3,5],[4,5],[10,4]]){g.fillStyle="#f4f8ff";g.beginPath();g.arc(x,12,r,0,6.283);g.fill()}g.globalAlpha=1;for(const [x,y] of [[-6,-2],[5,-4],[0,4]]){g.fillStyle="#ffd54a";g.fillRect(x,y,2,2);g.fillRect(x-1,y+1,4,0+1)}}}}
 function charEvolve(st){const p=state.p,E=CHAR_EVO[p.charId][st],c=chars.get(p.charId);p.evo=st;
@@ -1596,7 +1608,7 @@ if(EV&&p.evo>=2)ignisAura(p,t);
 const hop=mv?Math.abs(Math.sin(w)):0,bob=mv?-Math.round(hop*2):0,sy=mv?1+(hop-.5)*.08:1+Math.sin(t*3)*.025,sx=1/sy,rot=mv?Math.sin(w/2)*.05:0;
 ctx.globalAlpha=.4-hop*.1;ctx.fillStyle="#050a08";const sw=24-Math.round(hop*3);ctx.fillRect(Math.round(p.x)-sw/2,Math.round(p.y)+11,sw,5);ctx.globalAlpha=1;
 ctx.save();ctx.translate(Math.round(p.x),Math.round(p.y)+bob);ctx.scale(f,1);ctx.translate(0,12);ctx.rotate(rot);ctx.scale(sx*(EVS?EVS.scale:1),sy*(EVS?EVS.scale:1));ctx.translate(0,-12);
-if(Z){if(EVX){ctx.save();ctx.translate(0,-7);ctx.scale(EVX.wing,EVX.wing);ctx.translate(0,7);drawWings(ctx,t,mv);ctx.restore()}else drawWings(ctx,t,mv)}if(EV)ignisWings(ctx,t,mv,p.evo);if(HM){shellBack(ctx,EVX&&EVX.shell);snakeBack(ctx,t,mv)}const tp=Z?[-12,10]:HM?[2,-14]:BK?baekhoTail(ctx,t,mv):CR?cheongTail(ctx,t,mv):HW?hwangTail(ctx,t,mv):QL?qilinTail(ctx,t,mv):IM?imugiTail(ctx,t,mv):dragonTail(ctx,t,mv,EV&&EV.tail);if(EV)ctx.drawImage(evIm,-16,-24-EV.extra*2);else ctx.drawImage(EVX?(fr?EVX.B:EVX.A).n:im,-16,-24);if(HM){hyunmuBlink(ctx,t);if(!(p.whipT>0))snakeFront(ctx,t,mv)}else if(BK)baekhoBlink(ctx,t);else if(CR){cheongBlink(ctx,t);cheongExtras(ctx,t,mv,p)}else if(HW){hwangBlink(ctx,t);hwangExtras(ctx,t,mv,p)}else if(QL){qilinBlink(ctx,t);qilinExtras(ctx,t,mv,p)}else if(IM){imugiBlink(ctx,t);imugiExtras(ctx,t,mv,p)}else dragonBlink(ctx,t,Z?(EVX?EVX.pal.R:"#e8442a"):EV?EV.pal.R:undefined);if(EVX)evoAcc(ctx,t,mv,p,p.charId,p.evo);if(Z&&!(p.swingT>0))drawSword(ctx,13,2,-.8+Math.sin(t*2.2)*.06,22,t);ctx.restore();if(Z&&p.swingT>0)drawSwing(p,bob);if(HM){if(p.whipT>0)drawWhip(p,bob);drawBarrier(p,bob,t)}if(BK&&p.clawT>0)drawClaw(p,bob);
+if(Z){if(EVX){ctx.save();ctx.translate(0,-7);ctx.scale(EVX.wing,EVX.wing);ctx.translate(0,7);drawWings(ctx,t,mv);ctx.restore()}else drawWings(ctx,t,mv)}if(EV)ignisWings(ctx,t,mv,p.evo);if(HM){shellBack(ctx,EVX&&EVX.shell);snakeBack(ctx,t,mv)}const tp=Z?[-12,10]:HM?[2,-14]:BK?baekhoTail(ctx,t,mv):CR?cheongTail(ctx,t,mv):HW?hwangTail(ctx,t,mv):QL?qilinTail(ctx,t,mv):IM?imugiTail(ctx,t,mv,p.evo||0):dragonTail(ctx,t,mv,EV&&EV.tail);if(EV)ctx.drawImage(evIm,-16,-24-EV.extra*2);else ctx.drawImage(EVX?(fr?EVX.B:EVX.A).n:im,-16,-24);if(HM){hyunmuBlink(ctx,t);if(!(p.whipT>0))snakeFront(ctx,t,mv)}else if(BK)baekhoBlink(ctx,t);else if(CR){cheongBlink(ctx,t);cheongExtras(ctx,t,mv,p)}else if(HW){hwangBlink(ctx,t);hwangExtras(ctx,t,mv,p)}else if(QL){qilinBlink(ctx,t);qilinExtras(ctx,t,mv,p)}else if(IM){imugiBlink(ctx,t);imugiExtras(ctx,t,mv,p)}else dragonBlink(ctx,t,Z?(EVX?EVX.pal.R:"#e8442a"):EV?EV.pal.R:undefined);if(EVX)evoAcc(ctx,t,mv,p,p.charId,p.evo);if(Z&&!(p.swingT>0))drawSword(ctx,13,2,-.8+Math.sin(t*2.2)*.06,22,t);ctx.restore();if(Z&&p.swingT>0)drawSwing(p,bob);if(HM){if(p.whipT>0)drawWhip(p,bob);drawBarrier(p,bob,t)}if(BK&&p.clawT>0)drawClaw(p,bob);
 if(!state.paused&&!state.dead&&Math.random()<(HM?(mv?.18:.08):BK?(mv?.3:.06):CR||HW||QL||IM?(mv?.25:.08):mv?.5:.25)){state.particles.push({x:Math.round(p.x+f*tp[0]+rand(-3,3)),y:Math.round(p.y+bob+tp[1]-12),vx:rand(-10,10)-f*(mv?14:0),vy:rand(-46,-22),life:rand(.4,.8),max:.8,color:(HM?["#bfefff","#7fd0ff","#e8fbff","#9fe4ff"]:BK?["#ffffff","#cfe8ff","#e8f0ff","#bfd4ff"]:CR?["#5affc8","#9fe8ff","#ffffff","#7ac0f8"]:HW?["#ffd54a","#fff0a0","#ffffff","#ff8a4a"]:QL?["#fff6c0","#ffffff","#9ae8d0","#ffc8d4"]:IM?["#9affd8","#8ad84a","#e8fff8","#3aa88a"]:["#ffd54a","#ff8a2a","#ffb43a","#fff0b0"])[Math.floor(rand(0,4))],size:2})}}
 function drawEnemy(e){if(e.boss){drawBoss(e);return}if(e.elite){ctx.save();ctx.globalCompositeOperation="lighter";ctx.globalAlpha=.35+.15*Math.sin(state.time*6+e.ph);ctx.strokeStyle="#ffd54a";ctx.lineWidth=2;ctx.beginPath();ctx.arc(Math.round(e.x),Math.round(e.y)-4,e.r+8,0,6.283);ctx.stroke();ctx.restore()}
 const t=state.time,hit=e.hit>0,k=SP[e.type]||SP.blob,im=hit?k.f:e.petT>0?(k.g||(k.g=tint(k.n,"#8a8478"))):k.n;
@@ -3854,7 +3866,7 @@ function hero(id,x,y,s,t,mv,a=1,st=0){g.save();g.globalAlpha=a;g.translate(Math.
  else if(id==="cheongryong"){cheongTail(g,t,mv);g.drawImage(SP.cheongA.n,-16,-24);cheongExtras(g,t,mv,null)}
  else if(id==="hwangryong"){hwangTail(g,t,mv);g.drawImage(SP.hwangA.n,-16,-24);hwangExtras(g,t,mv,null)}
  else if(id==="qilin"){qilinTail(g,t,mv);g.drawImage(SP.qilinA.n,-16,-24);qilinExtras(g,t,mv,null)}
- else if(id==="imugi"){imugiTail(g,t,mv);g.drawImage(st>=2?CHAR_EVO.imugi[2].A.n:SP.imugiA.n,-16,-24);imugiExtras(g,t,mv,{evo:1});if(st>=2)evoAcc(g,t,mv,null,"imugi",2)}}catch(_){}
+ else if(id==="imugi"){imugiTail(g,t,mv,st>=2?2:0);g.drawImage(st>=2?CHAR_EVO.imugi[2].A.n:SP.imugiA.n,-16,-24);imugiExtras(g,t,mv,{evo:1});if(st>=2)evoAcc(g,t,mv,null,"imugi",2)}}catch(_){}
  g.restore();g.globalAlpha=1}
 function mapBG(th,dark,warm){const sc=sceneOf(th);g.drawImage(sc.bg,0,0);if(sc.mid)g.drawImage(sc.mid,0,0);g.drawImage(sc.fg,0,0);
  if(dark>0){g.fillStyle=`rgba(8,14,40,${dark*.62})`;g.fillRect(0,0,TW,TH)}
