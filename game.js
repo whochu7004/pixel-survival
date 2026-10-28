@@ -73,7 +73,8 @@ const themeOf=()=>dailyRun&&dailyRun.map?dailyRun.map:MAP_THEMES.includes(settin
 /* ===== 언어 (한국어 / English) ===== */
 if(settings.lang!=="en")settings.lang="ko";
 const isEN=()=>settings.lang==="en",tx=(ko,en)=>isEN()?en:ko,tf=(o,k)=>o&&isEN()&&o[k+"En"]!=null?o[k+"En"]:o&&o[k];
-const GAME_NAME="ASHENWYRD",gameTitle=()=>"THE LAST EMBER";
+// 게임 이름: 한국어 모드 "애션워드: 최후의 불씨" · 영어 모드 "ASHENWYRD: The Last Ember"
+const gameName=()=>tx("애션워드","ASHENWYRD"),gameTitle=()=>tx("최후의 불씨","THE LAST EMBER");
 const worldXp=document.querySelector(".world-xp");if(worldXp)worldXp.style.display="none";
 for(const id of ["hpFill","expFill"]){const s=document.getElementById(id)?.closest(".stat");if(s)s.style.display="none"}
 const hudEl=document.querySelector(".hud");if(hudEl)hudEl.style.gridTemplateColumns="repeat(2,1fr)";
@@ -3693,7 +3694,7 @@ paint();return{relang(){if(!listen){msg="";paint()}},get listening(){return list
 const _applyLangT=applyLang;applyLang=function(){_applyLangT.apply(this,arguments);titleKeyUI.relang()};
 
 /* ================= 타이틀 로고: 심플한 픽셀 글자 (주 제목 ASHENWYRD / 아래 줄 THE LAST EMBER) ================= */
-const LOGO_MAIN=GAME_NAME;
+const logoMain=()=>gameName();
 const logo=(()=>{
 const cv=$("logoCanvas");if(!cv)return{draw(){},ignite(){},relang(){}};
 const LW=cv.width,LH=cv.height,g=cv.getContext("2d");g.imageSmoothingEnabled=false;
@@ -3704,7 +3705,7 @@ function mask(txt,px,base){const c=document.createElement("canvas");c.width=LW;c
  const d=x.getImageData(0,0,LW,LH).data,m=new Uint8Array(LW*LH);for(let i=0;i<m.length;i++)m[i]=d[i*4+3]>110?1:0;return m}
 function bounds(m){let t=LH,b=0;for(let y=0;y<LH;y++)for(let x=0;x<LW;x++)if(m[y*LW+x]){if(y<t)t=y;if(y>b)b=y}return[t,b]}
 function paint(){const k=fam()+settings.lang+(document.fonts&&document.fonts.check('20px "DotGothic16"')?1:0)+(document.fonts&&document.fonts.check('11px "Galmuri11"','가')?1:0);if(k===key)return;key=k;
- const M=mask(LOGO_MAIN,40,45),S=mask(gameTitle(),16,70),img=g.createImageData(LW,LH),d=img.data;
+ const M=mask(logoMain(),40,45),S=mask(gameTitle(),16,70),img=g.createImageData(LW,LH),d=img.data;
  const [mt,mb]=bounds(M),cut=mt+Math.round((mb-mt)*.58);
  const set=(i,c)=>{d[i*4]=c[0];d[i*4+1]=c[1];d[i*4+2]=c[2];d[i*4+3]=255};
  const at=(m,x,y)=>x>=0&&y>=0&&x<LW&&y<LH&&m[y*LW+x];
@@ -3719,7 +3720,7 @@ function paint(){const k=fam()+settings.lang+(document.fonts&&document.fonts.che
  const [st0,sb0]=bounds(S);let sl=LW,sr=0;for(let y=st0;y<=sb0;y++)for(let x=0;x<LW;x++)if(S[y*LW+x]){if(x<sl)sl=x;if(x>sr)sr=x}
  const cy=Math.round((st0+sb0)/2),gem=(cx)=>{[[0,-2],[-1,-1],[0,-1],[1,-1],[-2,0],[-1,0],[0,0],[1,0],[2,0],[-1,1],[0,1],[1,1],[0,2]].forEach(([ox,oy])=>{const x=cx+ox,y=cy+oy;if(x>=0&&x<LW)set(y*LW+x,Math.abs(ox)+Math.abs(oy)<2?[255,224,138]:[217,64,42])})};
  if(sr>sl){for(let x=sl-34;x<sl-10;x+=2)if(x>=0)set(cy*LW+x,[140,60,36]);for(let x=sr+11;x<sr+35;x+=2)if(x<LW)set(cy*LW+x,[140,60,36]);gem(sl-7);gem(sr+7)}
- g.clearRect(0,0,LW,LH);g.putImageData(img,0,0);cv.setAttribute("aria-label",LOGO_MAIN+" — "+gameTitle())}
+ g.clearRect(0,0,LW,LH);g.putImageData(img,0,0);cv.setAttribute("aria-label",logoMain()+" — "+gameTitle())}
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{key=""});
 return{draw(){paint()},ignite(){key=""},relang(){key=""}}})();
 /* ================= 픽셀 폰트 (설정에서 ON/OFF) ================= */
@@ -3729,7 +3730,7 @@ const GALMURI_URL="https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/";
 (()=>{const st=document.createElement("style");st.textContent='body.pixel-font,body.pixel-font *{font-family:"DotGothic16","Galmuri11",monospace!important;-webkit-font-smoothing:none;font-smooth:never;text-rendering:optimizeSpeed}body.pixel-font :is(h1,h2,h3,b,strong,button){font-weight:400!important}body:not(.pixel-font),body:not(.pixel-font) *{font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif!important}';document.head.appendChild(st);
 const d=Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype,"font");
 Object.defineProperty(ctx,"font",{configurable:true,get(){return d.get.call(this)},set(v){d.set.call(this,settings.pixelFont?String(v).replace(/bold\s*/,"").replace(/(monospace|sans-serif)\s*$/,'"DotGothic16","Galmuri11",$1'):String(v).replace(/(monospace|sans-serif)\s*$/,'"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif'))}});
-if(document.fonts&&document.fonts.load){document.fonts.load('16px "DotGothic16"','ASHENWYRD');try{const pr=document.fonts.load('11px "Galmuri11"','최후의 불씨');if(pr&&typeof pr.then==="function")pr.then(()=>logo.relang(),()=>{})}catch(_){}}})();
+if(document.fonts&&document.fonts.load){document.fonts.load('16px "DotGothic16"','ASHENWYRD');try{const pr=document.fonts.load('11px "Galmuri11"','애션워드 최후의 불씨');if(pr&&typeof pr.then==="function")pr.then(()=>logo.relang(),()=>{})}catch(_){}}})();
 function applyFont(){document.body.classList.toggle("pixel-font",!!settings.pixelFont)}
 {const r=document.querySelector('[data-i18n="t4"]');if(r){const k='숲에 숨은 <b>용암 보물 상자</b>를 열면 오래 가는 보너스 아이템을 얻어요. 적을 처치해 봉인을 풀어야 열리고, 열수록 더 많이 처치해야 해요.';r.dataset.ko=k;if(!isEN())r.innerHTML=k}}
 {const r=document.querySelector('[data-i18n="rowFont"]');if(r){const k='<strong>픽셀 폰트</strong><small>켜면 도트 글꼴, 끄면 매끈한 일반 글꼴로 읽기 편해져요 (로고는 그대로)</small>';r.dataset.ko=k;if(!isEN())r.innerHTML=k}}
@@ -3820,9 +3821,9 @@ const SC=[
  sky("#0a0a1a","#2a1410");stars(t,.6);scroll(FA,0,0);g.drawImage(FB,0,0);g.drawImage(FC,0,0);
  const p=ease(t/.35),k=1+(1-p)*1.2,sh=t<.6?Math.round(Math.sin(t*90)*3*(1-t/.6)):0;glow("big",192,100,300,.5*p+.1*Math.sin(t*6));
  for(let i=0;i<14;i++){const ph=(t*.5+i/14)%1;g.globalAlpha=1-ph;g.fillStyle=pals[i%3];g.fillRect(Math.round(80+i*17+Math.sin(t*2+i)*5),Math.round(210-ph*150),2,2)}g.globalAlpha=1;
- g.textAlign="center";g.textBaseline="middle";g.save();g.translate(192+sh,100);g.scale(k,k);g.globalAlpha=p;g.font=`30px ${fnt()}`;g.lineJoin="round";g.lineWidth=6;g.strokeStyle="#2a0e08";g.strokeText(GAME_NAME,0,0);
- g.shadowColor="rgba(255,120,40,.95)";g.shadowBlur=14;g.fillStyle="#c0301a";g.fillText(GAME_NAME,0,2);g.shadowBlur=0;g.fillStyle="#ffb04a";g.fillText(GAME_NAME,0,0);g.restore();
- g.globalAlpha=ease((t-1)/.8);g.font=`10px ${fnt()}`;g.fillStyle="#ffe9b8";g.fillText("T H E   L A S T   E M B E R",192,128);g.globalAlpha=1;g.textAlign="left";g.textBaseline="alphabetic";
+ g.textAlign="center";g.textBaseline="middle";g.save();g.translate(192+sh,100);g.scale(k,k);g.globalAlpha=p;g.font=`30px ${fnt()}`;g.lineJoin="round";g.lineWidth=6;g.strokeStyle="#2a0e08";g.strokeText(gameName(),0,0);
+ g.shadowColor="rgba(255,120,40,.95)";g.shadowBlur=14;g.fillStyle="#c0301a";g.fillText(gameName(),0,2);g.shadowBlur=0;g.fillStyle="#ffb04a";g.fillText(gameName(),0,0);g.restore();
+ g.globalAlpha=ease((t-1)/.8);g.font=`10px ${fnt()}`;g.fillStyle="#ffe9b8";g.fillText(tx("최 후 의   불 씨","T H E   L A S T   E M B E R"),192,128);g.globalAlpha=1;g.textAlign="left";g.textBaseline="alphabetic";
  g.globalAlpha=Math.max(0,1-t/.5)*.9;g.fillStyle="#fff";g.fillRect(0,0,TW,TH);g.globalAlpha=1}}
 ];
 const hx=(a,b,t)=>"#"+[1,3,5].map(i=>{const p=parseInt(a.substr(i,2),16),q=parseInt(b.substr(i,2),16);return Math.round(p+(q-p)*t).toString(16).padStart(2,"0")}).join("");
@@ -4364,7 +4365,7 @@ t5:`Clear the story to unlock the <b>Magic Tower</b>. Defeat enough foes on each
 recTitle:`Records · Achievements`,recAria:`Records and achievements`,tabR:`Records`,tabA:`Achievements`,tabC:`Challenges`,tabT:`Titles`,charTitle:`Characters`
 };
 function applyLang(){
- const E=isEN();document.documentElement.lang=E?"en":"ko";document.title="ASHENWYRD: The Last Ember";
+ const E=isEN();document.documentElement.lang=E?"en":"ko";document.title=E?"ASHENWYRD: The Last Ember":"애션워드: 최후의 불씨";
  document.querySelectorAll("[data-i18n]").forEach(el=>{if(el.dataset.ko==null)el.dataset.ko=el.innerHTML;const en=I18N_EN[el.dataset.i18n];el.innerHTML=E&&en!=null?en:el.dataset.ko});
  for(const [sel,attr,key] of [["[data-i18n-aria]","aria-label","i18nAria"],["[data-i18n-title]","title","i18nTitle"]])
   document.querySelectorAll(sel).forEach(el=>{const ko=key+"Ko";if(el.dataset[ko]==null)el.dataset[ko]=el.getAttribute(attr)||"";const en=I18N_EN[el.dataset[key]];el.setAttribute(attr,E&&en!=null?en:el.dataset[ko])});
