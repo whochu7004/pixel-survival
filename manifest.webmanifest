@@ -3,6 +3,7 @@
   "short_name": "애션워드",
   "description": "아기 용 이그니가 마지막 불씨를 지키는 픽셀 서바이벌 로그라이크",
   "lang": "ko",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
